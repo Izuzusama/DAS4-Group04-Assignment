@@ -15,6 +15,7 @@ class TrackerImpl extends java.rmi.server.UnicastRemoteObject implements Tracker
   TrackerImpl() throws RemoteException {
     super();
     serviceDict = new HashMap<String, ArrayList<ServiceNode>>();
+    serviceNodes = new ArrayList<>();
   }
 
   private void Log(String log) {
@@ -47,7 +48,7 @@ class TrackerImpl extends java.rmi.server.UnicastRemoteObject implements Tracker
   }
 
   @Override
-  public ServiceNode[] GetMeServices(String[] services) throws RemoteException {
+  public IServiceNode[] GetMeServices(String[] services) throws RemoteException {
     ArrayList<ServiceNode> sns = new ArrayList<>();
     for (String s : services) {
       ArrayList<ServiceNode> sn = serviceDict.get(s);
@@ -69,6 +70,7 @@ class TrackerImpl extends java.rmi.server.UnicastRemoteObject implements Tracker
         break;
       }
     }
+    Log(MessageFormat.format("IP: {0} removed", getClientHost()));
     for (String service : removeNode.Services) {
       serviceDict.get(service).remove(removeNode);
     }
@@ -82,5 +84,18 @@ class TrackerImpl extends java.rmi.server.UnicastRemoteObject implements Tracker
     services.clear();
     services.addAll(set);
     return services.toArray(new ServiceNode[services.size()]);
+  }
+  
+  public void PrintInfo(){
+    System.out.print("\033[H\033[2J");
+    for (ServiceNode sn : serviceNodes) {
+      System.out.println(MessageFormat.format("Server {0}", sn.Ip));
+      System.out.println("===");
+      for (String service : sn.Services) {
+        System.out.print(service);
+      }
+      System.out.println();
+      System.out.println("===");
+    }
   }
 }
