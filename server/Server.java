@@ -15,8 +15,7 @@ public class Server {
       try {
         System.out.println("Cant find properties file. Writing default.");
         FileOutputStream out = new FileOutputStream("server.config.properties");
-        p.put("tracker", "localhost");
-        p.put("rmi_registry", "localhost");
+        p.put("tracker", "localhost:1099");
         p.put("services", "a,b,c,d,e");
         p.put("rmi_registry_port", "1000");
         p.store(out, null);
