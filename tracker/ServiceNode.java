@@ -1,6 +1,17 @@
-public class ServiceNode {
+public class ServiceNode implements IServiceNode {
   public String Ip;
+  public int Port; 
   public String[] Services;
+
+  public String getIp(){
+    return Ip;
+  }
+  public int getPort(){
+    return Port;
+  }
+  public String[] getService(){
+    return Services;
+  }
 
   @Override
   public int hashCode() {
