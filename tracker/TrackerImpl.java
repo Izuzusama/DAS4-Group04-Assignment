@@ -48,6 +48,12 @@ class TrackerImpl extends java.rmi.server.UnicastRemoteObject implements Tracker
   }
 
   @Override
+  public IServiceNode[] GetMeService(String service) throws RemoteException{
+    ArrayList<ServiceNode> sn = serviceDict.get(service);
+    return sn.toArray(new ServiceNode[sn.size()]);
+  }
+
+  @Override
   public IServiceNode[] GetMeServices(String[] services) throws RemoteException {
     ArrayList<ServiceNode> sns = new ArrayList<>();
     for (String s : services) {
