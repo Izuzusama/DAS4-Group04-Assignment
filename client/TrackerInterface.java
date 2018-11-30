@@ -2,7 +2,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.ServerNotActiveException;
 
 public interface TrackerInterface extends java.rmi.Remote {
-  public Boolean RegisterMeAsService(String[] services) throws RemoteException, ServerNotActiveException;
+  public Boolean RegisterMeAsService(String[] services) throws RemoteException;
 
   public IServiceNode[] GetMeService(String service) throws RemoteException;
   
