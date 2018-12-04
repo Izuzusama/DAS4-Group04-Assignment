@@ -17,11 +17,25 @@ public class Callback extends java.rmi.server.UnicastRemoteObject implements ICa
       return "UNKNOWN";
     }
   }
-  public void NewCallback(String sn, String dt) throws RemoteException{
+  public void NewCallback(String sn, String[] dt) throws RemoteException{
     cbe.broadcast(new EventArgs(){{
       serviceName = sn;
       data = dt;
       ipAddress = getClientIp();
+    }});
+  }
+  public void NewCallback(String sn, byte[][] dt) throws RemoteException{
+    cbe.broadcast(new EventArgs(){{
+      serviceName = sn;
+      byteData = dt;
+      ipAddress = getClientIp();
+    }});
+  }
+  public void NewExceptionCallback(String sn, Exception ex){
+    cbe.broadcast(new EventArgs(){{
+      serviceName = sn;
+      ipAddress = getClientIp();
+      exception = ex;
     }});
   }
 }
@@ -29,7 +43,9 @@ public class Callback extends java.rmi.server.UnicastRemoteObject implements ICa
 class EventArgs {
   String serviceName;
   String ipAddress;
-  String data;
+  String[] data;
+  byte[][] byteData;
+  Exception exception;
 }
 
 class CallbackEvent{

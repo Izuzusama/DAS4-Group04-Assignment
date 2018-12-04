@@ -9,9 +9,9 @@ public class Client {
   static Registry r;
   static TrackerHandler trackerHandler;
   static CallbackEvent cbe;
+  static Properties p;
   public static void main(String[] args) {
-    // Setup callback
-    Properties p = new Properties();
+    p = new Properties();
     File file = new File("client.config.properties");
     if (!file.exists()) {
       try {
@@ -43,6 +43,7 @@ public class Client {
       return;
     }
     cbe = new CallbackEvent();
+    // Setup callback
     new CallbackServer(p, cbe).start();
     trackerHandler = new TrackerHandler(p);
     if (!trackerHandler.Init()) {

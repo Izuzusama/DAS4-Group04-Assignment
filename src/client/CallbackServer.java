@@ -3,7 +3,7 @@ import java.text.MessageFormat;
 import java.util.Properties;
 
 public class CallbackServer {
-  Callback cb;
+  ICallback cb;
   Properties p;
   CallbackEvent cbe;
   public CallbackServer(Properties p, CallbackEvent cbe){
@@ -14,7 +14,7 @@ public class CallbackServer {
     try {
       cb = new Callback(this.cbe);
       System.out.println("Server Ready");
-      Naming.rebind(MessageFormat.format("rmi://localhost:{0}/Callback", p.get("rmi_registry_port")), cb);
+      Naming.rebind(MessageFormat.format("rmi://0.0.0.0:{0}/Callback", p.get("rmi_registry_port")), cb);
     } catch (Exception e) {
       e.printStackTrace();
     }

@@ -1,15 +1,10 @@
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.util.Arrays;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 class ServiceVideoSplit implements IService {
-
   public String[] run(String[] data) {
     return null;
   }
@@ -30,7 +25,7 @@ class ServiceVideoSplit implements IService {
     }
     // split file
     try {
-      final String[] cmd = { "ffmpeg", "-i", "temp/" + data2[0], "-vf", "\"scale=720:-1,fps=1/8\"",
+      final String[] cmd = { "ffmpeg", "-i", "temp/" + data2[0], "-vf", "\"scale=720:-1,fps=4\"",
           "temp/" + data2[0] + "out/out%d.png" };
       System.out.println(Arrays.toString(cmd));
       Process proc = Runtime.getRuntime().exec(cmd);

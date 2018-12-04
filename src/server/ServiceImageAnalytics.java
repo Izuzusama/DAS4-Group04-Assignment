@@ -13,7 +13,7 @@ public class ServiceImageAnalytics implements IService {
     return null;
   }
   public byte[][] run(byte[][] data, String[] data2) {
-    if(Server.p.getProperty("image_analytics_simulate") == "0"){
+    if(Server.p.getProperty("image_analytics_simulate").equals("0")){
       return ExecuteImageAnalytics(data);
     }
     return ExecuteImageAnalyticsSimulate();
