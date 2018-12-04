@@ -8,9 +8,10 @@ import java.util.Properties;
 
 public class Server {
   static Registry r;
-
+  static Properties p;
   public static void main(String[] args) {
    Properties p = new Properties();
+   Server.p = p;
    File file = new File("server.config.properties");
    if (!file.exists()) {
      try {
@@ -19,6 +20,9 @@ public class Server {
        p.put("tracker", "localhost:1099");
        p.put("services", "VideoAnalytics,VideoSplit,ImageAnalytics,ImageAnalyticsGraph");
        p.put("rmi_registry_port", "1000");
+       p.put("image_analytics_model_dir", "models/ssd_inception_v2_coco_2017_11_17");
+       p.put("image_analytics_label", "labels/mscoco_label_map.pbtxt");
+       p.put("image_analytics_simulate", "0");
        p.store(out, null);
      } catch (Exception e) {
        System.err.println("Unable to save file server.config.properties");
