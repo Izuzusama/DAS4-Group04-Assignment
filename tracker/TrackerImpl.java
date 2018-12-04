@@ -29,7 +29,7 @@ class TrackerImpl extends java.rmi.server.UnicastRemoteObject implements Tracker
       return "UNKNOWN";
     }
   }
-  public Boolean RegisterMeAsService(String[] services) throws RemoteException {
+  public Boolean RegisterMeAsService(String[] services, int port) throws RemoteException {
     try {
       getClientHost();
     } catch (Exception e) {
@@ -47,6 +47,7 @@ class TrackerImpl extends java.rmi.server.UnicastRemoteObject implements Tracker
     ServiceNode serviceNode = new ServiceNode();
     serviceNode.Ip = clientHost();
     serviceNode.Services = services;
+    serviceNode.Port = port;
     for (String s : services) {
       ArrayList<IServiceNode> sn = serviceDict.get(s);
       if (sn == null) {
@@ -55,7 +56,7 @@ class TrackerImpl extends java.rmi.server.UnicastRemoteObject implements Tracker
       }
       sn.add(serviceNode);
     }
-    Log(MessageFormat.format("IP: {0} added with services {1}", clientHost(), Arrays.toString(services)));
+    Log(MessageFormat.format("IP: {0}:{1} added with services {2}", clientHost(), port, Arrays.toString(services)));
     serviceNodes.add(serviceNode);
     return true;
   }

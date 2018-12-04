@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Properties;
@@ -16,7 +17,7 @@ public class Server {
         System.out.println("Cant find properties file. Writing default.");
         FileOutputStream out = new FileOutputStream("server.config.properties");
         p.put("tracker", "localhost:1099");
-        p.put("services", "a,b,c,d,e");
+        p.put("services", "VideoAnalytics,VideoSplit,ImageAnalytics,ImageAnalyticsGraph");
         p.put("rmi_registry_port", "1000");
         p.store(out, null);
       } catch (Exception e) {

@@ -8,7 +8,7 @@ import java.util.Properties;
 public class Client {
   static Registry r;
   static TrackerHandler trackerHandler;
-
+  static CallbackEvent cbe;
   public static void main(String[] args) {
     // Setup callback
     Properties p = new Properties();
@@ -42,22 +42,12 @@ public class Client {
       e.printStackTrace();
       return;
     }
-    new CallbackServer(p).start();
+    cbe = new CallbackEvent();
+    new CallbackServer(p, cbe).start();
     trackerHandler = new TrackerHandler(p);
     if (!trackerHandler.Init()) {
       return;
     }
-    IServiceNode[] sn = trackerHandler.Query("a");
-    if (sn == null) {
-      System.err.println("No result from query!");
-      return;
-    }
-    try {
-      for (IServiceNode s : sn) {
-        System.out.println(s.getIp());
-      }
-    } catch (Exception e) {
-      // TODO: handle exception
-    }
+    new ClientJobVideoAnalytics(trackerHandler, cbe).run();
   }
 }

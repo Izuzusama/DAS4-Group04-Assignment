@@ -28,10 +28,10 @@ public class ServerService {
         }
       });
       t = (TrackerInterface) Naming.lookup(MessageFormat.format("rmi://{0}/TrackerService", properties.get("tracker")));
-      t.RegisterMeAsService(services);
+      t.RegisterMeAsService(services, Integer.parseInt(properties.get("rmi_registry_port").toString()));
       System.out.println("Connected to tracker");
-      ServiceImpl si = new ServiceImpl();
-      Naming.rebind(MessageFormat.format("rmi://localhost:{0}/Service", properties.get("rmi_registry_port")), si);
+      IServiceInterface service = new ServiceImpl();
+      Naming.bind(MessageFormat.format("rmi://0.0.0.0:{0}/Service", properties.get("rmi_registry_port")), service);
       System.out.println("Service Published");
     } catch (Exception e) {
       e.printStackTrace();

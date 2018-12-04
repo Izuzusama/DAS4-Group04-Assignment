@@ -1,17 +1,35 @@
 import java.rmi.RemoteException;
 
-public class ServiceImpl extends java.rmi.server.UnicastRemoteObject implements ServiceInterface {
+public class ServiceImpl extends java.rmi.server.UnicastRemoteObject implements IServiceInterface {
   ServiceImpl() throws RemoteException {
     super();
   }
-  public String RunService(String service, String data) throws RemoteException {
+
+  private IService getServiceClass(String serviceName) throws ClassNotFoundException, InstantiationException, IllegalAccessException{
+    Class serviceClass = Class.forName("Service" + serviceName);
+    return (IService) serviceClass.newInstance();
+  }
+  public String[] RunService(String service, String[] data) throws RemoteException {
     try {
-      Class serviceClass = Class.forName("Service" + service.toUpperCase());
-      Service serviceInstance = (Service) serviceClass.newInstance();
-      return serviceInstance.run(data);
+      return getServiceClass(service).run(data);
     } catch (Exception e) {
       e.printStackTrace();
       return null;
     }
+  }
+  
+  public boolean RunServiceAsync(String service, String[] data) throws RemoteException {
+    return false;
+  }
+  public byte[][] RunService(String service, byte[][] data, String[] data2) throws RemoteException {
+    try {
+      return getServiceClass(service).run(data, data2);
+    } catch (Exception e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
+  public boolean RunServiceAsync(String service, byte[][] data, String[] data2) throws RemoteException {
+    return false;
   }
 }
