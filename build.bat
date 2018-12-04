@@ -20,3 +20,4 @@ cd ..\..\
 
 REM Copy Lib files
 copy /Y lib\* bin\server\
+copy /Y tools\ffmpeg.exe bin\server\
