@@ -1,6 +1,8 @@
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.util.Arrays;
 
@@ -28,17 +30,20 @@ class ServiceVideoSplit implements IService {
       final String[] cmd = { "ffmpeg", "-i", "temp/" + data2[0], "-vf", "\"scale=720:-1,fps=4\"",
           "temp/" + data2[0] + "out/out%d.png" };
       System.out.println(Arrays.toString(cmd));
-      Process proc = Runtime.getRuntime().exec(cmd);
-      InputStream in = proc.getErrorStream();
-      int c;
-      while ((c = in.read()) != -1) {}
+      ProcessBuilder ps = new ProcessBuilder(cmd);
+      ps.redirectErrorStream(true);
+      Process pr = ps.start();
+      BufferedReader in = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+      String line;
+      while ((line = in.readLine()) != null) {
+          System.out.println(line);
+      }
       in.close();
-      proc.waitFor();
+      pr.waitFor();
     } catch (Exception e) {
       e.printStackTrace();
       return null;
     }
-    
     File dir = new File("temp/" + data2[0] + "out/");
     File[] files = dir.listFiles();
     byte[][] bytes = new byte[files.length][];

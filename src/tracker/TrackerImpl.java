@@ -21,31 +21,17 @@ class TrackerImpl extends java.rmi.server.UnicastRemoteObject implements Tracker
   private void Log(String log) {
     System.out.println(log);
   }
-  private String clientHost(){
-    try {
-      return getClientHost();
-    } catch (ServerNotActiveException e) {
-      e.printStackTrace();
-      return "UNKNOWN";
-    }
-  }
-  public Boolean RegisterMeAsService(String[] services, int port) throws RemoteException {
-    try {
-      getClientHost();
-    } catch (Exception e) {
-      e.printStackTrace();
-      System.err.println("Unable to get host ip.");
-      return false;
-    }
-    Log(MessageFormat.format("Request: {0}", clientHost()));
+  
+  public Boolean RegisterMeAsService(String[] services, int port, String ipAddr) throws RemoteException {
+    Log(MessageFormat.format("Request: {0}", ipAddr));
     for (IServiceNode sn : serviceNodes) {
-      if (sn.getIp().equals(clientHost())) {
-        Log(MessageFormat.format("IP: {0} already added", clientHost()));
+      if (sn.getIp().equals(ipAddr)) {
+        Log(MessageFormat.format("IP: {0} already added", ipAddr));
         return false;
       }
     }
     ServiceNode serviceNode = new ServiceNode();
-    serviceNode.Ip = clientHost();
+    serviceNode.Ip = ipAddr;
     serviceNode.Services = services;
     serviceNode.Port = port;
     for (String s : services) {
@@ -56,20 +42,18 @@ class TrackerImpl extends java.rmi.server.UnicastRemoteObject implements Tracker
       }
       sn.add(serviceNode);
     }
-    Log(MessageFormat.format("IP: {0}:{1} added with services {2}", clientHost(), port, Arrays.toString(services)));
+    Log(MessageFormat.format("IP: {0}:{1} added with services {2}", ipAddr, port, Arrays.toString(services)));
     serviceNodes.add(serviceNode);
     return true;
   }
 
   public IServiceNode[] GetMeService(String service) throws RemoteException{
-    Log(MessageFormat.format("Request: {0} querying {1}", clientHost(), service));
     ArrayList<IServiceNode> sn = serviceDict.get(service);
     if(sn == null) return new IServiceNode[0];
     return sn.toArray(new IServiceNode[sn.size()]);
   }
 
   public IServiceNode[] GetMeServices(String[] services) throws RemoteException {
-    Log(MessageFormat.format("Request: {0} querying {1}", clientHost(), services));
     ArrayList<IServiceNode> sns = new ArrayList<>();
     for (String s : services) {
       ArrayList<IServiceNode> sn = serviceDict.get(s);
@@ -80,24 +64,17 @@ class TrackerImpl extends java.rmi.server.UnicastRemoteObject implements Tracker
     return MergeServiceNodes(sns);
   }
 
-  public Boolean RemoveMe() throws RemoteException, ServerNotActiveException {
-    try {
-      getClientHost();
-    } catch (Exception e) {
-      e.printStackTrace();
-      System.err.println("Unable to get host ip.");
-      return false;
-    }
+  public Boolean RemoveMe(String ipAddr) throws RemoteException, ServerNotActiveException {
     IServiceNode removeNode = null;
     for (IServiceNode sn : serviceNodes) {
-      if (sn.getIp() != clientHost()) {
+      if (sn.getIp() != ipAddr) {
         return false;
       } else {
         removeNode = sn;
         break;
       }
     }
-    Log(MessageFormat.format("IP: {0} removed", clientHost()));
+    Log(MessageFormat.format("IP: {0} removed", ipAddr));
     for (String service : removeNode.getService()) {
       serviceDict.get(service).remove(removeNode);
     }
@@ -112,17 +89,4 @@ class TrackerImpl extends java.rmi.server.UnicastRemoteObject implements Tracker
     services.addAll(set);
     return services.toArray(new IServiceNode[services.size()]);
   }
-  
-  // public void PrintInfo(){
-  //   System.out.print("\033[H\033[2J");
-  //   for (IServiceNode sn : serviceNodes) {
-  //     System.out.println(MessageFormat.format("Server {0}", sn.Ip));
-  //     System.out.println("===");
-  //     for (String service : sn.Services) {
-  //       System.out.print(service);
-  //     }
-  //     System.out.println();
-  //     System.out.println("===");
-  //   }
-  // }
 }

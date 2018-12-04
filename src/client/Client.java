@@ -11,6 +11,7 @@ public class Client {
   static CallbackEvent cbe;
   static Properties p;
   public static void main(String[] args) {
+    System.setProperty("java.rmi.server.useLocalHostname","true");
     p = new Properties();
     File file = new File("client.config.properties");
     if (!file.exists()) {
@@ -18,6 +19,7 @@ public class Client {
         System.out.println("Cant find properties file. Writing default.");
         FileOutputStream out = new FileOutputStream("client.config.properties");
         p.put("trackers", "localhost:1099");
+        p.put("rmi_registry_host", "localhost");
         p.put("rmi_registry_port", "1088");
         p.store(out, null);
       } catch (Exception e) {

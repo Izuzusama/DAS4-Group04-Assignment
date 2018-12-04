@@ -104,6 +104,9 @@ class ServiceVideoAnalytics implements IService {
         }
       }
     }
+    if(nameToOccurance.keySet().size() == 0){
+      return null;
+    }
     for (String key : nameToOccurance.keySet()) {
       sb.append(key).append(",").append(nameToOccurance.get(key)).append("\n");
     }

@@ -19,6 +19,7 @@ public class Server {
        FileOutputStream out = new FileOutputStream("server.config.properties");
        p.put("tracker", "localhost:1099");
        p.put("services", "VideoAnalytics,VideoSplit,ImageAnalytics,ImageAnalyticsGraph");
+       p.put("rmi_registry_host", "localhost");
        p.put("rmi_registry_port", "1000");
        p.put("image_analytics_model_dir", "models/ssd_inception_v2_coco_2017_11_17/saved_model");
        p.put("image_analytics_label", "labels/mscoco_label_map.pbtxt");
@@ -40,6 +41,7 @@ public class Server {
      }
    }
    try {
+     System.setProperty("java.rmi.server.hostname",p.getProperty("rmi_registry_host"));
      int port = Integer.parseInt(p.get("rmi_registry_port").toString());
      r = LocateRegistry.createRegistry(port);
    } catch (Exception e) {

@@ -14,7 +14,8 @@ public class CallbackServer {
     try {
       cb = new Callback(this.cbe);
       System.out.println("Server Ready");
-      Naming.rebind(MessageFormat.format("rmi://0.0.0.0:{0}/Callback", p.get("rmi_registry_port")), cb);
+     System.setProperty("java.rmi.server.hostname",p.getProperty("rmi_registry_host"));
+      Naming.rebind(MessageFormat.format("rmi://{0}:{1}/Callback", p.getProperty("rmi_registry_host"), p.getProperty("rmi_registry_port")), cb);
     } catch (Exception e) {
       e.printStackTrace();
     }

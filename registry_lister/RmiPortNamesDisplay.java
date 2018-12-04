@@ -52,6 +52,8 @@ public class RmiPortNamesDisplay
          {
             System.out.println("\t" + name);
          }
+         IServiceInterface iface = (IServiceInterface)registry.lookup("Service");
+         iface.RunService("service", null);
       }
       catch (ConnectException connectEx)
       {
@@ -62,6 +64,9 @@ public class RmiPortNamesDisplay
       catch (RemoteException remoteEx)
       {
          System.err.println("RemoteException encountered: " + remoteEx.toString());
+      }
+      catch(Exception e){
+        e.printStackTrace();
       }
    }
 }

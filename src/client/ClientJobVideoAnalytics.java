@@ -2,7 +2,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.file.Files;
 import java.rmi.Naming;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.text.MessageFormat;
+import java.util.Arrays;
 
 public class ClientJobVideoAnalytics {
   TrackerHandler trackerHandler;
@@ -25,11 +28,9 @@ public class ClientJobVideoAnalytics {
     IServiceInterface service = null;
     for (IServiceNode s : sn) {
       try {
-        // for (String str : Naming.list("rmi://" + s.getIp() + ":" + s.getPort())) {
-        //   System.out.println(str);
-        // }
-        service = (IServiceInterface) Naming.lookup("rmi://" + s.getIp() + ":" + s.getPort() + "/Service");
-        service.RunService("", null);
+        Registry cr = LocateRegistry.getRegistry(s.getIp(), s.getPort());
+        System.out.println(Arrays.toString(cr.list()));
+        service = (IServiceInterface) cr.lookup("Service");
         break;
       } catch (Exception e) {
         e.printStackTrace();
@@ -41,7 +42,6 @@ public class ClientJobVideoAnalytics {
       return;
     }
     try {
-      service.RunService("", null);
       File f = new File("Video.mp4");
       byte[] fileContent = Files.readAllBytes(f.toPath());
       service.RunServiceAsync("VideoAnalytics", new byte[][] { fileContent },

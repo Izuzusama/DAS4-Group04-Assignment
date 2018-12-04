@@ -56,6 +56,7 @@ public class ServiceImageAnalytics implements IService {
       while ((line = in.readLine()) != null) {
           System.out.println(line);
       }
+      in.close();
       pr.waitFor();
     } catch (Exception e) {
       e.printStackTrace();

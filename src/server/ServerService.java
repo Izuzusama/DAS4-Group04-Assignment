@@ -21,17 +21,17 @@ public class ServerService {
         public void run() {
           try {
             System.out.println("Removing myself from tracker");
-            ServerService.t.RemoveMe();
+            ServerService.t.RemoveMe(properties.getProperty("rmi_registry_host"));
           } catch (Exception e) {
             e.printStackTrace();
           }
         }
       });
       t = (TrackerInterface) Naming.lookup(MessageFormat.format("rmi://{0}/TrackerService", properties.get("tracker")));
-      t.RegisterMeAsService(services, Integer.parseInt(properties.get("rmi_registry_port").toString()));
+      t.RegisterMeAsService(services, Integer.parseInt(properties.get("rmi_registry_port").toString()), properties.getProperty("rmi_registry_host"));
       System.out.println("Connected to tracker");
       IServiceInterface service = new ServiceImpl();
-      Naming.bind(MessageFormat.format("rmi://0.0.0.0:{0}/Service", properties.get("rmi_registry_port")), service);
+      Naming.rebind(MessageFormat.format("rmi://{0}/Service", properties.getProperty("rmi_registry_host") + ":" + properties.getProperty("rmi_registry_port")), service);
       System.out.println("Service Published");
     } catch (Exception e) {
       e.printStackTrace();

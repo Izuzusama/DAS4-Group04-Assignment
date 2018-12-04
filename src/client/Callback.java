@@ -10,31 +10,25 @@ public class Callback extends java.rmi.server.UnicastRemoteObject implements ICa
     super();
     this.cbe = cbe;
   }
-  String getClientIp(){
-    try {
-      return getClientHost();
-    } catch (Exception e) {
-      return "UNKNOWN";
-    }
-  }
+  
   public void NewCallback(String sn, String[] dt) throws RemoteException{
     cbe.broadcast(new EventArgs(){{
       serviceName = sn;
       data = dt;
-      ipAddress = getClientIp();
+      ipAddress = "";
     }});
   }
   public void NewCallback(String sn, byte[][] dt) throws RemoteException{
     cbe.broadcast(new EventArgs(){{
       serviceName = sn;
       byteData = dt;
-      ipAddress = getClientIp();
+      ipAddress = "";
     }});
   }
   public void NewExceptionCallback(String sn, Exception ex){
     cbe.broadcast(new EventArgs(){{
       serviceName = sn;
-      ipAddress = getClientIp();
+      ipAddress = "";
       exception = ex;
     }});
   }
