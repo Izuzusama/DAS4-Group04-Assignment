@@ -13,7 +13,7 @@ public class ServiceImageAnalyticsGraph implements IService {
     byte[] csvStringByte = data[0];
     String csvString = new String(csvStringByte);
     String[] splitNewLineCsv = csvString.split("\n");
-    PieChart chart = new PieChartBuilder().width(1920).height(1080).title("Pie Chart").build();
+    PieChart chart = new PieChartBuilder().width(800).height(600).title("Pie Chart").build();
     chart.getStyler().setCircular(false);
     for (String s : splitNewLineCsv) {
       String[] splitStr = s.split(",");
