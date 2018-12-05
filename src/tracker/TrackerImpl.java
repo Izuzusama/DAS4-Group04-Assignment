@@ -67,12 +67,13 @@ class TrackerImpl extends java.rmi.server.UnicastRemoteObject implements Tracker
   public Boolean RemoveMe(String ipAddr) throws RemoteException, ServerNotActiveException {
     IServiceNode removeNode = null;
     for (IServiceNode sn : serviceNodes) {
-      if (sn.getIp() != ipAddr) {
-        return false;
-      } else {
+      if (sn.getIp().equals(ipAddr)) {
         removeNode = sn;
         break;
       }
+    }
+    if(removeNode == null){
+      return false;
     }
     Log(MessageFormat.format("IP: {0} removed", ipAddr));
     for (String service : removeNode.getService()) {

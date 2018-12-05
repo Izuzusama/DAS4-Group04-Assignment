@@ -1,3 +1,4 @@
+import java.awt.Desktop;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.file.Files;
@@ -62,10 +63,11 @@ public class ClientJobVideoAnalytics {
       }
       System.out.println("Callback from VideoAnalytics service from " + args.ipAddress);
       try {
-        new File("temp_client/").mkdirs();
-        try (FileOutputStream fos = new FileOutputStream("temp_client/" + "graph.png")) {
+        File imgFile = new File("graph.png");
+        try (FileOutputStream fos = new FileOutputStream(imgFile)) {
           fos.write(args.byteData[0]);
         }
+        Desktop.getDesktop().open(imgFile);
       } catch (Exception e) {
         e.printStackTrace();
       }

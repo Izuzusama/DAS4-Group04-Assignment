@@ -4,6 +4,19 @@ import java.util.Map;
 import java.util.Properties;
 
 public class ServerService {
+  class ShutdownThread extends Thread{
+    public TrackerInterface t;
+    public Properties properties;
+    @Override
+    public void run() {
+      try {
+        System.out.println("Removing myself from tracker.");
+        t.RemoveMe(properties.getProperty("rmi_registry_host"));
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+  }
   Properties properties;
   String[] services;
   public static TrackerInterface t;
@@ -16,18 +29,11 @@ public class ServerService {
 
   void run() {
     try {
-      Runtime.getRuntime().addShutdownHook(new Thread() {
-        @Override
-        public void run() {
-          try {
-            System.out.println("Removing myself from tracker");
-            ServerService.t.RemoveMe(properties.getProperty("rmi_registry_host"));
-          } catch (Exception e) {
-            e.printStackTrace();
-          }
-        }
-      });
+      ShutdownThread st = new ShutdownThread();
+      st.properties = properties;
+      Runtime.getRuntime().addShutdownHook(st);
       t = (TrackerInterface) Naming.lookup(MessageFormat.format("rmi://{0}/TrackerService", properties.get("tracker")));
+      st.t = t;
       t.RegisterMeAsService(services, Integer.parseInt(properties.get("rmi_registry_port").toString()), properties.getProperty("rmi_registry_host"));
       System.out.println("Connected to tracker");
       IServiceInterface service = new ServiceImpl();
