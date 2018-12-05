@@ -7,11 +7,12 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 public class ClientJobVideoAnalytics {
   TrackerHandler trackerHandler;
   CallbackEvent cbe;
-
+  long startTime;
   public ClientJobVideoAnalytics(TrackerHandler trackerHandler, CallbackEvent cbe) {
     this.trackerHandler = trackerHandler;
     this.cbe = cbe;
@@ -21,6 +22,7 @@ public class ClientJobVideoAnalytics {
     cbe.addListener((x) -> {
       callBackFromVideoAnalytics(x);
     });
+    startTime = System.currentTimeMillis();
     IServiceNode[] sn = trackerHandler.Query("VideoAnalytics");
     if (sn == null) {
       System.err.println("Cant find any service with name {VideoAnalytics} quit.");
@@ -68,6 +70,11 @@ public class ClientJobVideoAnalytics {
           fos.write(args.byteData[0]);
         }
         Desktop.getDesktop().open(imgFile);
+        long stopTime = System.currentTimeMillis();
+        long elapsedTime = stopTime - startTime;
+        System.out.println("It took: " + elapsedTime + "ms");
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(elapsedTime);
+        System.out.println("AKA: " + minutes + " minutes.");
       } catch (Exception e) {
         e.printStackTrace();
       }
