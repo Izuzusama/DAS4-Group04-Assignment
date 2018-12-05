@@ -12,6 +12,7 @@ public class Server {
   public static void main(String[] args) {
    Properties p = new Properties();
    Server.p = p;
+   // Load the config
    File file = new File("server.config.properties");
    if (!file.exists()) {
      try {
@@ -33,6 +34,7 @@ public class Server {
      }
    } else {
      try {
+      // If cant load config
        FileInputStream in = new FileInputStream("server.config.properties");
        p.load(in);
      } catch (Exception e) {
@@ -42,13 +44,17 @@ public class Server {
      }
    }
    try {
+    // Set hostname of registry to {hostname} or not it will use first network interface and cause problems
      System.setProperty("java.rmi.server.hostname",p.getProperty("rmi_registry_host"));
+     // Parse RMI Registry port
      int port = Integer.parseInt(p.get("rmi_registry_port").toString());
+     // Create a local registry so user does not need to
      r = LocateRegistry.createRegistry(port);
    } catch (Exception e) {
      e.printStackTrace();
      return;
    }
+   // Start server
    new ServerService(p).run();
   }
 }

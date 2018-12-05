@@ -2,7 +2,7 @@
 %%Title: build.bat, build.sh, download_models.ps1, download_models.sh, README.md, Callback.java, CallbackServer.java, Client.java, ClientJobVideoAnalytics.java, ICallback.java
 %%For: 
 %%Creator: a2ps version 4.14
-%%CreationDate: Wed Dec  5 18:53:01 2018
+%%CreationDate: Wed Dec  5 19:29:10 2018
 %%BoundingBox: 24 24 571 818
 %%DocumentData: Clean7Bit
 %%Orientation: Landscape
@@ -1000,7 +1000,7 @@ x0 y0 moveto
 (| services                  | Services that this server will provide. Split by c) N
 (omma \(,\)                                                                   | Vid) N
 (eoAnalytics,VideoSplit,ImageAnalytics,ImageAnalyticsGraph |) N
-(README.md) (Page 1/3) (Dec 05, 18 18:07) title
+(README.md) (Page 1/3) (Dec 05, 18 19:00) title
 border
 /v 1 store
 /x0 x v get 3.362408 add sx cw mul add store
@@ -1021,6 +1021,9 @@ x0 y0 moveto
 (| rmi_registry_host         | The server rmi registry host/IP                   ) N
 (                                                                           | loc) N
 (alhost                                                    |) N
+(| ffmpeg_command            | The server ffmpeg command to run. Not needed if no) N
+(t providing VideoSplitService.                                             | ./f) N
+(fmpeg                                                     |) N
 () N
 (### Client) N
 () N
@@ -1066,10 +1069,7 @@ x0 y0 moveto
 (## Xchart) N
 () N
 (The ImageAnalyticsGraph part of the program uses an external library called xchart <https://knowm.org/open-source/x) N
-(chart/>. No modification is made on the source. A copy of the license can be found at lib/xchart-LICENSE) N
-() N
-(## ffmpeg) N
-(README.md) (Page 2/3) (Dec 05, 18 18:07) title
+(README.md) (Page 2/3) (Dec 05, 18 19:00) title
 border
 grestore
 (Printed by ) rhead
@@ -1089,14 +1089,17 @@ llx lly 12 add translate
 /x0 x v get 3.362408 add sx cw mul add store
 /y0 y v get bfs th add sub store
 x0 y0 moveto
-() str n
+(chart/>. No modification is made on the source. A copy of the license can be found at lib/xchart-LICENSE) str n
+() N
+(## ffmpeg) N
+() N
 (The VideoSplit part of the program uses an external application called ffmpeg <https://www.ffmpeg.org/> to split vide) N
 (os to multiple images.) N
 () N
 (## 7za) N
 () N
 (No part of the application is using 7za.exe but it is used for the `download_models.ps1` script.) S
-(README.md) (Page 3/3) (Dec 05, 18 18:07) title
+(README.md) (Page 3/3) (Dec 05, 18 19:00) title
 border
 grestore
 (Printed by ) rhead
@@ -1147,7 +1150,7 @@ x0 y0 moveto
 (\(\);) p n
 (    this.cbe = cbe;) N
 (  }) N
-(  ) N
+() N
 (  ) S
 (public) K
 ( ) p
@@ -1233,7 +1236,7 @@ x0 y0 moveto
 (    listeners.forEach\(x -> x.accept\(args\)\);) N
 (  }) N
 (}) S
-(Callback.java) (Page 1/1) (Dec 04, 18 19:28) title
+(Callback.java) (Page 1/1) (Dec 05, 18 18:57) title
 border
 grestore
 (Printed by ) rhead
@@ -1269,12 +1272,14 @@ x0 y0 moveto
 (  ICallback cb;) N
 (  Properties p;) N
 (  CallbackEvent cbe;) N
+() N
 (  ) S
 (public) K
-( CallbackServer\(Properties p, CallbackEvent cbe\){) p n
+( CallbackServer\(Properties p, CallbackEvent cbe\) {) p n
 (    this.p = p;) N
 (    this.cbe = cbe;) N
 (  }) N
+() N
 (  ) S
 (public) K
 ( ) p
@@ -1283,15 +1288,17 @@ x0 y0 moveto
 (    ) S
 (try) K
 ( {) p n
-(      cb = ) S
+(      ) S
+(// Startup the RMI callback server) c n
+(      cb = ) p
 (new) K
 ( Callback\(this.cbe\);) p n
 (      System.out.println\(") S
 (Server Ready) str
 ("\);) p n
-(     System.setProperty\(") S
+(      System.setProperty\(") S
 (java.rmi.server.hostname) str
-(",p.getProperty\(") p
+(", p.getProperty\(") p
 (rmi_registry_host) str
 ("\)\);) p n
 (      Naming.rebind\(MessageFormat.format\(") S
@@ -1299,7 +1306,8 @@ x0 y0 moveto
 (", p.getProperty\(") p
 (rmi_re) str n
 (gistry_host) S
-("\), p.getProperty\(") p
+("\),) p n
+(          p.getProperty\(") S
 (rmi_registry_port) str
 ("\)\), cb\);) p n
 (    } ) S
@@ -1309,7 +1317,7 @@ x0 y0 moveto
 (    }) N
 (  }) N
 (}) S
-(CallbackServer.java) (Page 1/1) (Dec 04, 18 20:41) title
+(CallbackServer.java) (Page 1/1) (Dec 05, 18 19:07) title
 border
 grestore
 (Printed by ) rhead
@@ -1360,6 +1368,7 @@ x0 y0 moveto
 (  ) S
 (static) K
 ( Properties p;) p n
+() N
 (  ) S
 (public) K
 ( ) p
@@ -1367,11 +1376,6 @@ x0 y0 moveto
 ( ) p
 (void) k
 ( main\(String[] args\) {) p n
-(    System.setProperty\(") S
-(java.rmi.server.useLocalHostname) str
-(",") p
-(true) str
-("\);) p n
 (    p = ) S
 (new) K
 ( Properties\(\);) p n
@@ -1389,7 +1393,9 @@ x0 y0 moveto
 (        System.out.println\(") S
 (Cant find properties file. Writing default.) str
 ("\);) p n
-(        FileOutputStream out = ) S
+(        ) S
+(// Load default config) c n
+(        FileOutputStream out = ) p
 (new) K
 ( FileOutputStream\(") p
 (client.config.properties) str
@@ -1429,7 +1435,9 @@ x0 y0 moveto
 (      ) S
 (try) K
 ( {) p n
-(        FileInputStream in = ) S
+(        ) S
+(// Load config) c n
+(        FileInputStream in = ) p
 (new) K
 ( FileInputStream\(") p
 (client.config.properties) str
@@ -1451,11 +1459,15 @@ x0 y0 moveto
 (try) K
 ( {) p n
 (      ) S
+(// Parse RMI Registry port) c n
+(      ) p
 (int) k
 ( port = Integer.parseInt\(p.get\(") p
 (rmi_registry_port) str
 ("\).toString\(\)\);) p n
-(      r = LocateRegistry.createRegistry\(port\);) N
+(      ) S
+(// Create a local registry for callback so user does not need to) c n
+(      r = LocateRegistry.createRegistry\(port\);) p n
 (    } ) S
 (catch) K
 ( \(Exception e\) {) p n
@@ -1464,30 +1476,32 @@ x0 y0 moveto
 (return) K
 (;) p n
 (    }) N
-(    cbe = ) S
+(    ) S
+(// Setup callback) c n
+(    cbe = ) p
 (new) K
 ( CallbackEvent\(\);) p n
 (    ) S
-(// Setup callback) c n
-(    ) p
 (new) K
 ( CallbackServer\(p, cbe\).start\(\);) p n
-(    trackerHandler = ) S
+(    ) S
+(// Setup tracker connection) c n
+(    trackerHandler = ) p
 (new) K
 ( TrackerHandler\(p\);) p n
 (    ) S
 (if) K
 ( \(!trackerHandler.Init\(\)\) {) p n
-(      ) S
-(return) K
-(;) p n
+(      System.exit\(1\);) N
 (    }) N
 (    ) S
+(// Run job) c n
+(    ) p
 (new) K
 ( ClientJobVideoAnalytics\(trackerHandler, cbe\).run\(\);) p n
 (  }) N
 (}) N
-(Client.java) (Page 1/1) (Dec 04, 18 20:43) title
+(Client.java) (Page 1/1) (Dec 05, 18 19:10) title
 border
 grestore
 (Printed by ) rhead
@@ -1539,6 +1553,7 @@ x0 y0 moveto
 (  ) S
 (long) k
 ( startTime;) p n
+() N
 (  ) S
 (public) K
 ( ClientJobVideoAnalytics\(TrackerHandler trackerHandler, CallbackEvent cb) p n
@@ -1552,11 +1567,17 @@ x0 y0 moveto
 ( ) p
 (void) k
 ( run\(\) {) p n
-(    cbe.addListener\(\(x\) -> {) N
+(    ) S
+(// Register callback event) c n
+(    cbe.addListener\(\(x\) -> {) p n
 (      callBackFromVideoAnalytics\(x\);) N
 (    }\);) N
-(    startTime = System.currentTimeMillis\(\);) N
-(    IServiceNode[] sn = trackerHandler.Query\(") S
+(    ) S
+(// Record down start time) c n
+(    startTime = System.currentTimeMillis\(\);) p n
+(    ) S
+(// Query for VideoAnalytics Service from tracker) c n
+(    IServiceNode[] sn = trackerHandler.Query\(") p
 (VideoAnalytics) str
 ("\);) p n
 (    ) S
@@ -1564,12 +1585,12 @@ x0 y0 moveto
 ( \(sn == ) p
 (null) k
 (\) {) p n
-(      System.err.println\(") S
+(      ) S
+(// If cant find any) c n
+(      System.err.println\(") p
 (Cant find any service with name {VideoAnalytics} quit.) str
 ("\);) p n
-(      ) S
-(return) K
-(;) p n
+(      System.exit\(1\);) N
 (    }) N
 (    IServiceInterface service = ) S
 (null) k
@@ -1580,18 +1601,23 @@ x0 y0 moveto
 (      ) S
 (try) K
 ( {) p n
-(        Registry cr = LocateRegistry.getRegistry\(s.getIp\(\), s.getPort\(\)\);) N
-(        System.out.println\(Arrays.toString\(cr.list\(\)\)\);) N
+(        ) S
+(// try and connect to server registry) c n
+(        Registry cr = LocateRegistry.getRegistry\(s.getIp\(\), s.getPort\(\)\);) p n
 (        service = \(IServiceInterface\) cr.lookup\(") S
 (Service) str
 ("\);) p n
 (        ) S
+(// Found 1 means no exception, enough break out.) c n
+(        ) p
 (break) K
 (;) p n
 (      } ) S
 (catch) K
 ( \(Exception e\) {) p n
-(        e.printStackTrace\(\);) N
+(        ) S
+(// Cant connect to that continue look for antoher server) c n
+(        e.printStackTrace\(\);) p n
 (        System.out.println\(MessageFormat.format\(") S
 (Cant get service with ip {0}. Next.) str
 (", s.ge) p n
@@ -1599,6 +1625,8 @@ x0 y0 moveto
 (      }) N
 (    }) N
 (    ) S
+(// No server found) c n
+(    ) p
 (if) K
 ( \(service == ) p
 (null) k
@@ -1606,44 +1634,62 @@ x0 y0 moveto
 (      System.err.println\(") S
 (No service found! Quit.) str
 ("\);) p n
-(      ) S
-(return) K
-(;) p n
+(      System.exit\(1\);) N
 (    }) N
 (    ) S
 (try) K
 ( {) p n
-(      File f = ) S
+(      ) S
+(// Open Video.mp4 file) c n
+(      File f = ) p
 (new) K
 ( File\(") p
 (Video.mp4) str
 ("\);) p n
 (      ) S
+(// Read as bytes) c n
+(      ) p
 (byte) k
 ([] fileContent = Files.readAllBytes\(f.toPath\(\)\);) p n
-(      service.RunServiceAsync\(") S
+(      ) S
+(// Call VideoAnalytics Service via the found server. This function is) c n
+(ClientJobVideoAnalytics.java) (Page 1/2) (Dec 05, 18 19:07) title
+border
+/v 1 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(      ) p
+(// asynchronous.) c n
+(      service.RunServiceAsync\(") p
 (VideoAnalytics) str
 (", ) p
 (new) K
 ( ) p
 (byte) k
-([][] { fileContent },) p n
-(          ) S
+([][] { fileContent }, ) p
 (new) K
-( String[] { ") p
+( S) p n
+(tring[] { ") S
 (Video.mp4) str
-(" }, Client.p.getProperty\(") p
+(" },) p n
+(          Client.p.getProperty\(") S
 (rmi_registry_port) str
 ("\)\);) p n
 (    } ) S
 (catch) K
 ( \(Exception e\) {) p n
-(      System.err.println\(") S
-(Unable to submit job.) str
+(      ) S
+(// Server cant do it) c n
+(      System.err.println\(") p
+(Unable to submit job. Quit.) str
 ("\);) p n
 (      e.printStackTrace\(\);) N
+(      System.exit\(1\);) N
 (    }) N
-(    System.out.println\(") S
+(    ) S
+(// Server cant do it) c n
+(    System.out.println\(") p
 (Job submitted. Waiting for callback.) str
 ("\);) p n
 (  }) N
@@ -1654,37 +1700,37 @@ x0 y0 moveto
 (void) k
 ( callBackFromVideoAnalytics\(EventArgs args\) {) p n
 (    ) S
+(// A callback from the server with serviceName as VideoAnalytics) c n
+(    ) p
 (if) K
 ( \(args.serviceName.equals\(") p
 (VideoAnalytics) str
 ("\)\) {) p n
-(ClientJobVideoAnalytics.java) (Page 1/2) (Dec 05, 18 13:01) title
-border
-/v 1 store
-/x0 x v get 3.362408 add sx cw mul add store
-/y0 y v get bfs th add sub store
-x0 y0 moveto
+(      ) S
+(// If it is an exception, print it) c n
 (      ) p
 (if) K
-(\(args.exception != ) p
+( \(args.exception != ) p
 (null) k
-(\){) p n
+(\) {) p n
 (        System.err.println\(") S
 (Error Callback from VideoAnalytics Service from ) str
 (" + args.ipAddress) p n
 (\);) N
 (        args.exception.printStackTrace\(\);) N
-(        ) S
-(return) K
-(;) p n
+(        System.exit\(1\);) N
 (      }) N
-(      System.out.println\(") S
+(      ) S
+(// Else is result) c n
+(      System.out.println\(") p
 (Callback from VideoAnalytics service from ) str
 (" + args.ipAddress\);) p n
 (      ) S
 (try) K
 ( {) p n
-(        File imgFile = ) S
+(        ) S
+(// Save the return byte[] as image file.) c n
+(        File imgFile = ) p
 (new) K
 ( File\(") p
 (graph.png) str
@@ -1696,8 +1742,12 @@ x0 y0 moveto
 ( FileOutputStream\(imgFile\)\) {) p n
 (          fos.write\(args.byteData[0]\);) N
 (        }) N
-(        Desktop.getDesktop\(\).open\(imgFile\);) N
 (        ) S
+(// Open the image file.) c n
+(        Desktop.getDesktop\(\).open\(imgFile\);) p n
+(        ) S
+(// Print how long it takes) c n
+(        ) p
 (long) k
 ( stopTime = System.currentTimeMillis\(\);) p n
 (        ) S
@@ -1716,15 +1766,17 @@ x0 y0 moveto
 (" + minutes + ") p
 ( minutes.) str
 ("\);) p n
+(        System.exit\(0\);) N
 (      } ) S
 (catch) K
 ( \(Exception e\) {) p n
 (        e.printStackTrace\(\);) N
+(        System.exit\(1\);) N
 (      }) N
 (    }) N
 (  }) N
 (}) S
-(ClientJobVideoAnalytics.java) (Page 2/2) (Dec 05, 18 13:01) title
+(ClientJobVideoAnalytics.java) (Page 2/2) (Dec 05, 18 19:07) title
 border
 grestore
 (Printed by ) rhead
@@ -2023,7 +2075,9 @@ x0 y0 moveto
 (  ) S
 (public) K
 ( Boolean Init\(\) {) p n
-(    String[] trackerHosts = p.get\(") S
+(    ) S
+(// Get all trackers from properties) c n
+(    String[] trackerHosts = p.get\(") p
 (trackers) str
 ("\).toString\(\).split\(") p
 (,) str
@@ -2032,6 +2086,8 @@ x0 y0 moveto
 (new) K
 ( ArrayList<>\(\);) p n
 (    ) S
+(// Loop through all tracker and find all tracker that is available) c n
+(    ) p
 (for) K
 ( \() p
 (int) k
@@ -2089,6 +2145,8 @@ x0 y0 moveto
 (public) K
 ( IServiceNode[] Query\(String service\) {) p n
 (    ) S
+(// Loop through all tracker and find one that can return the wanted service) c n
+(    ) p
 (for) K
 ( \(TrackerInterface tracker : trackers\) {) p n
 (      ) S
@@ -2116,7 +2174,7 @@ x0 y0 moveto
 (;) p n
 (  }) N
 (}) S
-(TrackerHandler.java) (Page 1/1) (Nov 30, 18 13:52) title
+(TrackerHandler.java) (Page 1/1) (Dec 05, 18 19:09) title
 border
 grestore
 (Printed by ) rhead
@@ -2426,7 +2484,9 @@ x0 y0 moveto
 (    Properties p = ) S
 (new) K
 ( Properties\(\);) p n
-(    File file = ) S
+(    ) S
+(// Load the config) c n
+(    File file = ) p
 (new) K
 ( File\(") p
 (tracker.config.properties) str
@@ -2470,7 +2530,9 @@ x0 y0 moveto
 (      ) S
 (try) K
 ( {) p n
-(        FileInputStream in = ) S
+(        ) S
+(// If cant load config) c n
+(        FileInputStream in = ) p
 (new) K
 ( FileInputStream\(") p
 (tracker.config.properties) str
@@ -2492,11 +2554,15 @@ x0 y0 moveto
 (try) K
 ( {) p n
 (      ) S
+(// Parse RMI Registry port) c n
+(      ) p
 (int) k
 ( port = Integer.parseInt\(p.get\(") p
 (rmi_registry_port) str
 ("\).toString\(\)\);) p n
-(      r = LocateRegistry.createRegistry\(port\);) N
+(      ) S
+(// Create a local registry so user does not need to) c n
+(      r = LocateRegistry.createRegistry\(port\);) p n
 (    } ) S
 (catch) K
 ( \(Exception e\) {) p n
@@ -2506,11 +2572,13 @@ x0 y0 moveto
 (;) p n
 (    }) N
 (    ) S
+(// Start tracker server) c n
+(    ) p
 (new) K
 ( TrackerServer\(p\).start\(\);) p n
 (  }) N
 (}) N
-(Tracker.java) (Page 1/1) (Dec 04, 18 19:27) title
+(Tracker.java) (Page 1/1) (Dec 05, 18 19:11) title
 border
 grestore
 (Printed by ) rhead
@@ -2586,8 +2654,9 @@ x0 y0 moveto
 ( Log\(String log\) {) p n
 (    System.out.println\(log\);) N
 (  }) N
-(  ) N
 (  ) S
+(// Register a server as a service) c n
+(  ) p
 (public) K
 ( Boolean RegisterMeAsService\(String[] services, ) p
 (int) k
@@ -2599,13 +2668,16 @@ x0 y0 moveto
 (Request: {0}) str
 (", ipAddr\)\);) p n
 (    ) S
+(// Loop trough all service current service node. If the ip already registere) c n
+(d.) N
+(    ) p
 (for) K
 ( \(IServiceNode sn : serviceNodes\) {) p n
 (      ) S
 (if) K
 ( \(sn.getIp\(\).equals\(ipAddr\)\) {) p n
 (        Log\(MessageFormat.format\(") S
-(IP: {0} already added) str
+(IP: {0} already added.) str
 (", ipAddr\)\);) p n
 (        ) S
 (return) K
@@ -2614,13 +2686,17 @@ x0 y0 moveto
 (;) p n
 (      }) N
 (    }) N
-(    ServiceNode serviceNode = ) S
+(    ) S
+(// Create a new service node) c n
+(    ServiceNode serviceNode = ) p
 (new) K
 ( ServiceNode\(\);) p n
 (    serviceNode.Ip = ipAddr;) N
 (    serviceNode.Services = services;) N
 (    serviceNode.Port = port;) N
 (    ) S
+(// Make Map) c n
+(    ) p
 (for) K
 ( \(String s : services\) {) p n
 (      ArrayList<IServiceNode> sn = serviceDict.get\(s\);) N
@@ -2647,8 +2723,9 @@ x0 y0 moveto
 (true) k
 (;) p n
 (  }) N
-() N
 (  ) S
+(// Return all serviceNodes that matches the service requested) c n
+(  ) p
 (public) K
 ( IServiceNode[] GetMeService\(String service\) ) p
 (throws) K
@@ -2670,7 +2747,15 @@ x0 y0 moveto
 ( IServiceNode[sn.size\(\)]\);) p n
 (  }) N
 () N
-(  ) S
+(TrackerImpl.java) (Page 1/2) (Dec 05, 18 19:13) title
+border
+/v 1 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(  ) p
+(// Return all serviceNodes that matches the service requested) c n
+(  ) p
 (public) K
 ( IServiceNode[] GetMeServices\(String[] services\) ) p
 (throws) K
@@ -2682,13 +2767,7 @@ x0 y0 moveto
 (    ) S
 (for) K
 ( \(String s : services\) {) p n
-(TrackerImpl.java) (Page 1/2) (Dec 05, 18 11:02) title
-border
-/v 1 store
-/x0 x v get 3.362408 add sx cw mul add store
-/y0 y v get bfs th add sub store
-x0 y0 moveto
-(      ArrayList<IServiceNode> sn = serviceDict.get\(s\);) p n
+(      ArrayList<IServiceNode> sn = serviceDict.get\(s\);) N
 (      ) S
 (if) K
 ( \(sn != ) p
@@ -2703,6 +2782,8 @@ x0 y0 moveto
 (  }) N
 () N
 (  ) S
+(// Delist the serviceNode that matches the ipAddress) c n
+(  ) p
 (public) K
 ( Boolean RemoveMe\(String ipAddr\) ) p
 (throws) K
@@ -2766,7 +2847,7 @@ x0 y0 moveto
 ( IServiceNode[services.size\(\)]\);) p n
 (  }) N
 (}) S
-(TrackerImpl.java) (Page 2/2) (Dec 05, 18 11:02) title
+(TrackerImpl.java) (Page 2/2) (Dec 05, 18 19:13) title
 border
 grestore
 (Printed by ) rhead
@@ -2877,7 +2958,9 @@ x0 y0 moveto
 (    ) S
 (try) K
 ( {) p n
-(      t = ) S
+(      ) S
+(// Register tracker instance) c n
+(      t = ) p
 (new) K
 ( TrackerImpl\(\);) p n
 (      System.out.println\(") S
@@ -2896,7 +2979,7 @@ x0 y0 moveto
 (    }) N
 (  }) N
 (}) S
-(TrackerServer.java) (Page 1/1) (Nov 30, 18 14:13) title
+(TrackerServer.java) (Page 1/1) (Dec 05, 18 19:11) title
 border
 grestore
 (Printed by ) rhead
@@ -3340,7 +3423,9 @@ x0 y0 moveto
 (new) K
 ( Properties\(\);) p n
 (   Server.p = p;) N
-(   File file = ) S
+(   ) S
+(// Load the config) c n
+(   File file = ) p
 (new) K
 ( File\(") p
 (server.config.properties) str
@@ -3419,7 +3504,9 @@ x0 y0 moveto
 (     ) S
 (try) K
 ( {) p n
-(       FileInputStream in = ) S
+(      ) S
+(// If cant load config) c n
+(       FileInputStream in = ) p
 (new) K
 ( FileInputStream\(") p
 (server.config.properties) str
@@ -3440,17 +3527,24 @@ x0 y0 moveto
 (   ) S
 (try) K
 ( {) p n
-(     System.setProperty\(") S
+(    ) S
+(// Set hostname of registry to {hostname} or not it will use first network i) c n
+(nterface and cause problems) N
+(     System.setProperty\(") p
 (java.rmi.server.hostname) str
 (",p.getProperty\(") p
 (rmi_registry_host) str
 ("\)\);) p n
 (     ) S
+(// Parse RMI Registry port) c n
+(     ) p
 (int) k
 ( port = Integer.parseInt\(p.get\(") p
 (rmi_registry_port) str
 ("\).toString\(\)\);) p n
-(     r = LocateRegistry.createRegistry\(port\);) N
+(     ) S
+(// Create a local registry so user does not need to) c n
+(     r = LocateRegistry.createRegistry\(port\);) p n
 (   } ) S
 (catch) K
 ( \(Exception e\) {) p n
@@ -3460,11 +3554,13 @@ x0 y0 moveto
 (;) p n
 (   }) N
 (   ) S
+(// Start server) c n
+(   ) p
 (new) K
 ( ServerService\(p\).run\(\);) p n
 (  }) N
 (}) N
-(Server.java) (Page 1/1) (Dec 05, 18 18:32) title
+(Server.java) (Page 1/1) (Dec 05, 18 19:14) title
 border
 grestore
 (Printed by ) rhead
@@ -3519,6 +3615,8 @@ x0 y0 moveto
 (void) k
 ( run\(\) {) p n
 (      ) S
+(// Function that delist itself from tracker) c n
+(      ) p
 (try) K
 ( {) p n
 (        System.out.println\(") S
@@ -3558,19 +3656,27 @@ x0 y0 moveto
 (    ) S
 (try) K
 ( {) p n
-(      ShutdownThread st = ) S
+(      ) S
+(// Create a new shutdown thread) c n
+(      ShutdownThread st = ) p
 (new) K
 ( ShutdownThread\(\);) p n
 (      st.properties = properties;) N
-(      Runtime.getRuntime\(\).addShutdownHook\(st\);) N
-(      t = \(TrackerInterface\) Naming.lookup\(MessageFormat.format\(") S
+(      ) S
+(// Add shutdown thread to hook incase user use ctrl+c to stop the app) c n
+(      Runtime.getRuntime\(\).addShutdownHook\(st\);) p n
+(      ) S
+(// Look for the tracker) c n
+(      t = \(TrackerInterface\) Naming.lookup\(MessageFormat.format\(") p
 (rmi://{0}/TrackerServ) str n
 (ice) S
 (", properties.get\(") p
 (tracker) str
 ("\)\)\);) p n
 (      st.t = t;) N
-(      t.RegisterMeAsService\(services, Integer.parseInt\(properties.get\(") S
+(      ) S
+(// Advertise itself to the tracker) c n
+(      t.RegisterMeAsService\(services, Integer.parseInt\(properties.get\(") p
 (rmi_registry) str n
 (_port) S
 ("\).toString\(\)\), properties.getProperty\(") p
@@ -3582,7 +3688,9 @@ x0 y0 moveto
 (      IServiceInterface service = ) S
 (new) K
 ( ServiceImpl\(\);) p n
-(      Naming.rebind\(MessageFormat.format\(") S
+(      ) S
+(// Create new service instance and bind it) c n
+(      Naming.rebind\(MessageFormat.format\(") p
 (rmi://{0}/Service) str
 (", properties.getProperty\() p n
 (") S
@@ -3602,7 +3710,7 @@ x0 y0 moveto
 (    }) N
 (  }) N
 (}) S
-(ServerService.java) (Page 1/1) (Dec 05, 18 11:03) title
+(ServerService.java) (Page 1/1) (Dec 05, 18 19:15) title
 border
 grestore
 (Printed by ) rhead
@@ -3663,6 +3771,12 @@ x0 y0 moveto
 ("\);) p n
 (  }) N
 (  ) S
+(// data[0] Array of bytes) c n
+(  ) p
+(// data[0][0] bytes of Images) c n
+(  ) p
+(// data2 not used) c n
+(  ) p
 (public) K
 ( ) p
 (byte) k
@@ -3672,6 +3786,8 @@ x0 y0 moveto
 (throws) K
 ( Exception {) p n
 (    ) S
+(// If Simulate is on, use hard coded value) c n
+(    ) p
 (if) K
 (\(Server.p.getProperty\(") p
 (image_analytics_simulate) str
@@ -3687,6 +3803,8 @@ x0 y0 moveto
 ( ExecuteImageAnalyticsSimulate\(\);) p n
 (  }) N
 (  ) S
+(// Execute tensor flow detect object) c n
+(  ) p
 (private) K
 ( ) p
 (byte) k
@@ -3696,7 +3814,7 @@ x0 y0 moveto
 (throws) K
 ( Exception{) p n
 (    ) S
-(// Generate Files) c n
+(// Generate CSV file) c n
 (    File csvFile = ) p
 (new) K
 ( File\(") p
@@ -3724,7 +3842,9 @@ x0 y0 moveto
 (    ) S
 (try) K
 ( {) p n
-(      File basePath = ) S
+(      ) S
+(// Write the image to disk) c n
+(      File basePath = ) p
 (new) K
 ( File\(") p
 (image_analytics) str
@@ -3754,7 +3874,9 @@ x0 y0 moveto
 ( FileOutputStream\(f\)\) {) p n
 (          fos.write\(b\);) N
 (        }) N
-(        cmdA.add\(f.toString\(\)\);) N
+(      ) S
+(// Add to command) c n
+(        cmdA.add\(f.toString\(\)\);) p n
 (      }) N
 (    } ) S
 (catch) K
@@ -3772,14 +3894,24 @@ x0 y0 moveto
 ( String[cmdA.size\(\)];) p n
 (      cmdA.toArray\(cmd\);) N
 (      System.out.println\(Arrays.toString\(cmd\)\);) N
-(      ProcessBuilder ps = ) S
+(      ) S
+(// Call the tensor flow jar file to process images) c n
+(      ProcessBuilder ps = ) p
 (new) K
 ( ProcessBuilder\(cmd\);) p n
 (      ps.redirectErrorStream\() S
 (true) k
 (\);) p n
 (      Process pr = ps.start\(\);) N
-(      BufferedReader in = ) S
+(ServiceImageAnalytics.java) (Page 1/2) (Dec 05, 18 19:27) title
+border
+/v 1 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(      ) p
+(// Read the output stream) c n
+(      BufferedReader in = ) p
 (new) K
 ( BufferedReader\() p
 (new) K
@@ -3795,13 +3927,7 @@ x0 y0 moveto
 (      }) N
 (      in.close\(\);) N
 (      pr.waitFor\(\);) N
-(ServiceImageAnalytics.java) (Page 1/2) (Dec 05, 18 18:45) title
-border
-/v 1 store
-/x0 x v get 3.362408 add sx cw mul add store
-/y0 y v get bfs th add sub store
-x0 y0 moveto
-(    } ) p
+(    } ) S
 (catch) K
 ( \(Exception e\) {) p n
 (      e.printStackTrace\(\);) N
@@ -3813,6 +3939,8 @@ x0 y0 moveto
 (try) K
 ( {) p n
 (      ) S
+(// Read the csv file and return it) c n
+(      ) p
 (return) K
 ( ) p
 (new) K
@@ -3844,7 +3972,7 @@ x0 y0 moveto
 (".getBytes\(\)};) p n
 (  }) N
 (}) S
-(ServiceImageAnalytics.java) (Page 2/2) (Dec 05, 18 18:45) title
+(ServiceImageAnalytics.java) (Page 2/2) (Dec 05, 18 19:27) title
 border
 grestore
 (Printed by ) rhead
@@ -3884,9 +4012,9 @@ x0 y0 moveto
 ( IService {) p n
 (  ) S
 (public) K
-( String[] run\(String[] data\)) p
+( String[] run\(String[] data\) ) p
 (throws) K
-( Exception  {) p n
+( Exception {) p n
 (    ) S
 (throw) K
 ( ) p
@@ -3897,6 +4025,10 @@ x0 y0 moveto
 (  }) N
 () N
 (  ) S
+(// data[0] = csv content) c n
+(  ) p
+(// data2 not used) c n
+(  ) p
 (public) K
 ( ) p
 (byte) k
@@ -3911,10 +4043,14 @@ x0 y0 moveto
 (    String csvString = ) S
 (new) K
 ( String\(csvStringByte\);) p n
-(    String[] splitNewLineCsv = csvString.split\(") S
+(    ) S
+(// split the csv) c n
+(    String[] splitNewLineCsv = csvString.split\(") p
 (\\n) str
 ("\);) p n
-(    PieChart chart = ) S
+(    ) S
+(// New piechart builder) c n
+(    PieChart chart = ) p
 (new) K
 ( PieChartBuilder\(\).width\(800\).height\(600\).title\(") p
 (Pie Chart) str
@@ -3924,6 +4060,8 @@ x0 y0 moveto
 (false) k
 (\);) p n
 (    ) S
+(// Add the items) c n
+(    ) p
 (for) K
 ( \(String s : splitNewLineCsv\) {) p n
 (      String[] splitStr = s.split\(") S
@@ -3932,6 +4070,8 @@ x0 y0 moveto
 (      chart.addSeries\(splitStr[0], Integer.parseInt\(splitStr[1]\)\);) N
 (    }) N
 (    ) S
+(// Convert the image bitmap to byte) c n
+(    ) p
 (byte) k
 ([] imageData;) p n
 (    ) S
@@ -3948,16 +4088,17 @@ x0 y0 moveto
 ( e;) p n
 (    }) N
 (    ) S
+(// return it) c n
+(    ) p
 (return) K
 ( ) p
 (new) K
 ( ) p
 (byte) k
-([][]{imageData};) p n
+([][] { imageData };) p n
 (  }) N
-() N
 (}) S
-(ServiceImageAnalyticsGraph.java) (Page 1/1) (Dec 05, 18 18:45) title
+(ServiceImageAnalyticsGraph.java) (Page 1/1) (Dec 05, 18 19:26) title
 border
 grestore
 (Printed by ) rhead
@@ -4002,6 +4143,7 @@ x0 y0 moveto
 (  ) S
 (private) K
 ( CallBackHandler callbackHandler;) p n
+() N
 (  ServiceImpl\(\) ) S
 (throws) K
 ( RemoteException {) p n
@@ -4011,11 +4153,14 @@ x0 y0 moveto
 (  }) N
 () N
 (  ) S
+(// Get the service to run via Reflection) c n
+(  ) p
 (private) K
-( IService getServiceClass\(String serviceName\) ) p
+( IService getServiceClass\(String serviceName\)) p n
+(      ) S
 (throws) K
-( ClassNotFoundExcep) p n
-(tion, InstantiationException, IllegalAccessException{) N
+( ClassNotFoundException, InstantiationException, IllegalAccessExcept) p n
+(ion {) N
 (    Class serviceClass = Class.forName\(") S
 (Service) str
 (" + serviceName\);) p n
@@ -4025,23 +4170,26 @@ x0 y0 moveto
 (  }) N
 () N
 (  ) S
+(// Register client callback) c n
+(  ) p
 (private) K
 ( ) p
 (void) k
-( RegisterCallback\(String host, String clientPort\) ) p
+( RegisterCallback\(String host, String clientPort\)) p n
+(      ) S
 (throws) K
-( RemoteExc) p n
-(eption, NotBoundException, MalformedURLException {) N
+( RemoteException, NotBoundException, MalformedURLException {) p n
 (    ) S
 (if) K
-(\(this.callbackHandler != ) p
+( \(this.callbackHandler != ) p
 (null) k
-(\) ) p
+(\)) p n
+(      ) S
 (return) K
 (;) p n
-(    ICallback callback = \(ICallback\)Naming.lookup\(MessageFormat.format\(") S
-(rmi://{0}:{) str n
-(1}/Callback) S
+(    ICallback callback = \(ICallback\) Naming.lookup\(MessageFormat.format\(") S
+(rmi://{0}:) str n
+({1}/Callback) S
 (", host, clientPort\)\);) p n
 (    this.callbackHandler = ) S
 (new) K
@@ -4049,6 +4197,8 @@ x0 y0 moveto
 (  }) N
 () N
 (  ) S
+(// Run the service \(String variant\). This function is synchronous.) c n
+(  ) p
 (public) K
 ( String[] RunService\(String service, String[] data\) ) p
 (throws) K
@@ -4075,6 +4225,8 @@ x0 y0 moveto
 (  }) N
 () N
 (  ) S
+(// Run the service \(String variant\). This function is asynchronous.) c n
+(  ) p
 (public) K
 ( ) p
 (boolean) k
@@ -4085,8 +4237,12 @@ x0 y0 moveto
 (    ) S
 (try) K
 ( {) p n
-(      String clientHost = getClientHost\(\);) N
-(      RegisterCallback\(clientHost, callbackPort\);) N
+(      ) S
+(// Get connecting client IP) c n
+(      String clientHost = getClientHost\(\);) p n
+(      ) S
+(// Create new callback) c n
+(      RegisterCallback\(clientHost, callbackPort\);) p n
 (    } ) S
 (catch) K
 ( \(Exception e\) {) p n
@@ -4099,19 +4255,33 @@ x0 y0 moveto
 (Failed to register callback. Unable to get host) str
 (", e\);) p n
 (    }) N
-(    Thread t = ) S
+(    ) S
+(// Run execution in another thread so that the client does not need to wait) c n
+(    Thread t = ) p
 (new) K
 ( Thread\(\(\) -> {) p n
 (      ) S
 (try) K
 ( {) p n
-(        String[] result = RunService\(service, data\);) N
-(        callbackHandler.ExecuteCallback\(service, result\);) N
-(      } ) S
+(        ) S
+(// Run Service) c n
+(        String[] result = RunService\(service, data\);) p n
+(        ) S
+(// Call client callback when execution finished) c n
+(        callbackHandler.ExecuteCallback\(service, result\);) p n
+(ServiceImpl.java) (Page 1/2) (Dec 05, 18 19:20) title
+border
+/v 1 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(      } ) p
 (catch) K
 ( \(Exception e\) {) p n
 (        e.printStackTrace\(\);) N
-(        callbackHandler.ExecuteExceptionCallback\(service, e\);) N
+(        ) S
+(// Got an exception, tell client got exception via callback) c n
+(        callbackHandler.ExecuteExceptionCallback\(service, e\);) p n
 (      }) N
 (    }\);) N
 (    t.start\(\);) N
@@ -4123,6 +4293,8 @@ x0 y0 moveto
 (  }) N
 () N
 (  ) S
+(// Run the service \(Byte[][] variant\). This function is synchronous.) c n
+(  ) p
 (public) K
 ( ) p
 (byte) k
@@ -4135,13 +4307,7 @@ x0 y0 moveto
 (    ) S
 (try) K
 ( {) p n
-(ServiceImpl.java) (Page 1/2) (Dec 04, 18 17:30) title
-border
-/v 1 store
-/x0 x v get 3.362408 add sx cw mul add store
-/y0 y v get bfs th add sub store
-x0 y0 moveto
-(      ) p
+(      ) S
 (return) K
 ( getServiceClass\(service\).run\(data, data2\);) p n
 (    } ) S
@@ -4159,20 +4325,27 @@ x0 y0 moveto
 (  }) N
 () N
 (  ) S
+(// Run the service \(Byte[][] variant\). This function is asynchronous.) c n
+(  ) p
 (public) K
 ( ) p
 (boolean) k
 ( RunServiceAsync\(String service, ) p
 (byte) k
 ([][] data, String[] data2, ) p n
-(String callbackPort\) ) S
+(String callbackPort\)) N
+(      ) S
 (throws) K
 ( RemoteException {) p n
 (    ) S
 (try) K
 ( {) p n
-(      String clientHost = getClientHost\(\);) N
-(      RegisterCallback\(clientHost, callbackPort\);) N
+(      ) S
+(// Get connecting client IP) c n
+(      String clientHost = getClientHost\(\);) p n
+(      ) S
+(// Create new callback) c n
+(      RegisterCallback\(clientHost, callbackPort\);) p n
 (    } ) S
 (catch) K
 ( \(Exception e\) {) p n
@@ -4185,21 +4358,29 @@ x0 y0 moveto
 (Failed to register callback. Unable to get host) str
 (", e\);) p n
 (    }) N
-(    Thread t = ) S
+(    ) S
+(// Run execution in another thread so that the client does not need to wait) c n
+(    Thread t = ) p
 (new) K
 ( Thread\(\(\) -> {) p n
 (      ) S
 (try) K
 ( {) p n
 (        ) S
+(// Run Service) c n
+(        ) p
 (byte) k
 ([][] result = RunService\(service, data, data2\);) p n
-(        callbackHandler.ExecuteCallback\(service, result\);) N
+(        ) S
+(// Call client callback when execution finished) c n
+(        callbackHandler.ExecuteCallback\(service, result\);) p n
 (      } ) S
 (catch) K
 ( \(Exception e\) {) p n
 (        e.printStackTrace\(\);) N
-(        callbackHandler.ExecuteExceptionCallback\(service, e\);) N
+(        ) S
+(// Got an exception, tell client got exception via callback) c n
+(        callbackHandler.ExecuteExceptionCallback\(service, e\);) p n
 (      }) N
 (    }\);) N
 (    t.start\(\);) N
@@ -4210,7 +4391,7 @@ x0 y0 moveto
 (;) p n
 (  }) N
 (}) S
-(ServiceImpl.java) (Page 2/2) (Dec 04, 18 17:30) title
+(ServiceImpl.java) (Page 2/2) (Dec 05, 18 19:20) title
 border
 grestore
 (Printed by ) rhead
@@ -4345,9 +4526,9 @@ x0 y0 moveto
 (  }) N
 () N
 (  ) S
-(// data = video file) c n
+(// data[0] = video file) c n
 (  ) p
-(// data2 = filename) c n
+(// data2[0] = filename) c n
 (  ) p
 (public) K
 ( ) p
@@ -4371,6 +4552,8 @@ x0 y0 moveto
 (yticsGraph) S
 (", 1\);) p n
 (    ) S
+(// If one of the service have no node, tell throw error) c n
+(    ) p
 (if) K
 ( \(videoSplitNode == ) p
 (null) k
@@ -4411,6 +4594,8 @@ x0 y0 moveto
 (  }) N
 () N
 (  ) S
+(// Call the split video service node) c n
+(  ) p
 (private) K
 ( ) p
 (byte) k
@@ -4450,6 +4635,8 @@ x0 y0 moveto
 (  }) N
 () N
 (  ) S
+(// Split the task to \(max of 4\) nodes ) c n
+(  ) p
 (private) K
 ( ) p
 (byte) k
@@ -4490,7 +4677,9 @@ x0 y0 moveto
 (      ) S
 (final) K
 ( IServiceInterface serviceToRunAt = services.get\(i\);) p n
-(      Thread t = ) S
+(      ) S
+(// Create threads for each service to call. so can simultaneous calls) c n
+(      Thread t = ) p
 (new) K
 ( Thread\(\(\) -> {) p n
 (        ) S
@@ -4508,19 +4697,19 @@ x0 y0 moveto
 (          ) S
 (try) K
 ( {) p n
-(            bts[y] = filesToRun.get\(y\);) N
-(          } ) S
-(catch) K
-( \(Exception e\) {) p n
-(            e.printStackTrace\(\);) N
-(          }) N
-(ServiceVideoAnalytics.java) (Page 1/3) (Dec 05, 18 18:47) title
+(ServiceVideoAnalytics.java) (Page 1/3) (Dec 05, 18 19:26) title
 border
 /v 1 store
 /x0 x v get 3.362408 add sx cw mul add store
 /y0 y v get bfs th add sub store
 x0 y0 moveto
-(        }) p n
+(            bts[y] = filesToRun.get\(y\);) p n
+(          } ) S
+(catch) K
+( \(Exception e\) {) p n
+(            e.printStackTrace\(\);) N
+(          }) N
+(        }) N
 (        ) S
 (try) K
 ( {) p n
@@ -4546,6 +4735,8 @@ x0 y0 moveto
 (      threads[i] = t;) N
 (    }) N
 (    ) S
+(// Wait for all nodes to finish) c n
+(    ) p
 (for) K
 ( \() p
 (int) k
@@ -4563,7 +4754,9 @@ x0 y0 moveto
 ( e;) p n
 (      }) N
 (    }) N
-(    StringBuilder sb = ) S
+(    ) S
+(// Combine the result of all nodes) c n
+(    StringBuilder sb = ) p
 (new) K
 ( StringBuilder\(\);) p n
 (    Map<String, Integer> nameToOccurance = ) S
@@ -4644,6 +4837,8 @@ x0 y0 moveto
 (  }) N
 () N
 (  ) S
+(// Call the Graph node) c n
+(  ) p
 (private) K
 ( ) p
 (byte) k
@@ -4659,7 +4854,27 @@ x0 y0 moveto
 (    ) S
 (try) K
 ( {) p n
-(      fileBytes = service.RunService\(") S
+(ServiceVideoAnalytics.java) (Page 2/3) (Dec 05, 18 19:26) title
+border
+grestore
+(Printed by ) rhead
+(src/server/ServiceVideoAnalytics.java) (40/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (3) 41
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(      fileBytes = service.RunService\(") p
 (ImageAnalyticsGraph) str
 (", ) p
 (new) K
@@ -4680,29 +4895,11 @@ x0 y0 moveto
 (    ) S
 (return) K
 ( fileBytes[0];) p n
-(ServiceVideoAnalytics.java) (Page 2/3) (Dec 05, 18 18:47) title
-border
-grestore
-(Printed by ) rhead
-(src/server/ServiceVideoAnalytics.java) (40/47) (Wednesday December 05, 2018) footer
-end % of iso1dict
-pagesave restore
-showpage
-%%Page: (3) 41
-%%BeginPageSetup
-/pagesave save def
-sh 0 translate 90 rotate
-%%EndPageSetup
-iso1dict begin
-gsave
-llx lly 12 add translate
-/v 0 store
-/x0 x v get 3.362408 add sx cw mul add store
-/y0 y v get bfs th add sub store
-x0 y0 moveto
-(  }) p n
+(  }) N
 () N
 (  ) S
+(// Split files to nodes) c n
+(  ) p
 (private) K
 ( ArrayList<) p
 (byte) k
@@ -4810,7 +5007,7 @@ x0 y0 moveto
 ( services;) p n
 (  }) N
 (}) S
-(ServiceVideoAnalytics.java) (Page 3/3) (Dec 05, 18 18:47) title
+(ServiceVideoAnalytics.java) (Page 3/3) (Dec 05, 18 19:26) title
 border
 grestore
 (Printed by ) rhead
@@ -4818,7 +5015,7 @@ grestore
 end % of iso1dict
 pagesave restore
 showpage
-%%Page: (1) 42
+%%Page: (1-2) 42
 %%BeginPageSetup
 /pagesave save def
 sh 0 translate 90 rotate
@@ -4853,9 +5050,9 @@ x0 y0 moveto
 ( IService {) p n
 (  ) S
 (public) K
-( String[] run\(String[] data\)) p
+( String[] run\(String[] data\) ) p
 (throws) K
-( Exception  {) p n
+( Exception {) p n
 (    ) S
 (throw) K
 ( ) p
@@ -4866,24 +5063,24 @@ x0 y0 moveto
 (  }) N
 () N
 (  ) S
-(// data = video file) c n
+(// data[0] = video file) c n
 (  ) p
-(// data2 = filename) c n
+(// data2[0] = filename) c n
 (  ) p
 (public) K
 ( ) p
 (byte) k
 ([][] run\() p
 (byte) k
-([][] data, String[] data2\)) p
+([][] data, String[] data2\) ) p
 (throws) K
-( Exception  {) p n
+( Exception {) p n
 (    ) S
-(// Save the file) c n
-(    ) p
 (try) K
 ( {) p n
 (      ) S
+(// Save the video file) c n
+(      ) p
 (new) K
 ( File\(") p
 (temp/) str
@@ -4918,19 +5115,20 @@ x0 y0 moveto
 (try) K
 ( {) p n
 (      ) S
-(final) K
-( String[] cmd = { Server.p.getProperty\(") p
+(// Setup cmd) c n
+(      String[] cmd = { Server.p.getProperty\(") p
 (ffmpeg_command) str
 ("\), ") p
 (-i) str
 (", ") p
 (temp/) str
-(" ) p n
-(+ data2[0], ") S
+(" + data) p n
+(2[0], ") S
 (-vf) str
 (", ") p
 (scale=720:-1,fps=4) str
-(", ") p
+(",) p n
+(          ") S
 (temp/) str
 (" + data2[0] + ") p
 (out/out%d.png) str
@@ -4942,8 +5140,12 @@ x0 y0 moveto
 (      ps.redirectErrorStream\() S
 (true) k
 (\);) p n
-(      Process pr = ps.start\(\);) N
-(      BufferedReader in = ) S
+(      ) S
+(// Call ffmpeg to split video 4 frames per seconds) c n
+(      Process pr = ps.start\(\);) p n
+(      ) S
+(// Read the output stream) c n
+(      BufferedReader in = ) p
 (new) K
 ( BufferedReader\() p
 (new) K
@@ -4955,13 +5157,13 @@ x0 y0 moveto
 ( \(\(line = in.readLine\(\)\) != ) p
 (null) k
 (\) {) p n
-(          System.out.println\(line\);) N
+(        System.out.println\(line\);) N
 (      }) N
 (      in.close\(\);) N
 (      pr.waitFor\(\);) N
 (      ) S
 (if) K
-(\(pr.exitValue\(\) != 0\)) p n
+( \(pr.exitValue\(\) != 0\)) p n
 (        ) S
 (throw) K
 ( ) p
@@ -4977,7 +5179,9 @@ x0 y0 moveto
 (throw) K
 ( e;) p n
 (    }) N
-(    File dir = ) S
+(    ) S
+(// Read the output image files as byte) c n
+(    File dir = ) p
 (new) K
 ( File\(") p
 (temp/) str
@@ -5005,14 +5209,20 @@ x0 y0 moveto
 (catch) K
 ( \(Exception e\) {) p n
 (        e.printStackTrace\(\);) N
-(      }) N
+(ServiceVideoSplit.java) (Page 1/2) (Dec 05, 18 19:28) title
+border
+/v 1 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(      }) p n
 (    }) N
 (    ) S
 (return) K
 ( bytes;) p n
 (  }) N
 (}) S
-(ServiceVideoSplit.java) (Page 1/1) (Dec 05, 18 18:48) title
+(ServiceVideoSplit.java) (Page 2/2) (Dec 05, 18 19:28) title
 border
 grestore
 (Printed by ) rhead
@@ -5186,19 +5396,19 @@ x0 y0 moveto
 ( sheets   4 to   4 \( 1\) pages   4-  4   12 lines) p n
 ( 5 ) S
 (README.md...........) k
-( sheets   5 to   6 \( 2\) pages   5-  7   94 lines) p n
+( sheets   5 to   6 \( 2\) pages   5-  7   95 lines) p n
 ( 6 ) S
 (Callback.java.......) k
 ( sheets   7 to   7 \( 1\) pages   8-  8   56 lines) p n
 ( 7 ) S
 (CallbackServer.java.) k
-( sheets   8 to   8 \( 1\) pages   9-  9   24 lines) p n
+( sheets   8 to   8 \( 1\) pages   9-  9   28 lines) p n
 ( 8 ) S
 (Client.java.........) k
-( sheets   9 to   9 \( 1\) pages  10- 10   57 lines) p n
+( sheets   9 to   9 \( 1\) pages  10- 10   63 lines) p n
 ( 9 ) S
 (ClientJobVideoAnalytics.java) k
-( sheets  10 to  10 \( 1\) pages  11- 12   84 lines) p n
+( sheets  10 to  10 \( 1\) pages  11- 12  107 lines) p n
 (10 ) S
 (ICallback.java......) k
 ( sheets  11 to  11 \( 1\) pages  13- 13    8 lines) p n
@@ -5213,7 +5423,7 @@ x0 y0 moveto
 ( sheets  14 to  14 \( 1\) pages  16- 16   25 lines) p n
 (14 ) S
 (TrackerHandler.java.) k
-( sheets  15 to  15 \( 1\) pages  17- 17   56 lines) p n
+( sheets  15 to  15 \( 1\) pages  17- 17   59 lines) p n
 (15 ) S
 (TrackerInterface.java) k
 ( sheets  16 to  16 \( 1\) pages  18- 18   13 lines) p n
@@ -5237,88 +5447,84 @@ x0 y0 moveto
 ( sheets  21 to  21 \( 1\) pages  23- 23   25 lines) p n
 (22 ) S
 (Tracker.java........) k
-( sheets  22 to  22 \( 1\) pages  24- 24   44 lines) p n
+( sheets  22 to  22 \( 1\) pages  24- 24   49 lines) p n
 (23 ) S
 (TrackerImpl.java....) k
-( sheets  23 to  23 \( 1\) pages  25- 26   94 lines) p n
+( sheets  23 to  23 \( 1\) pages  25- 26   99 lines) p n
 (24 ) S
 (TrackerInterface.java) k
 ( sheets  24 to  24 \( 1\) pages  27- 27   13 lines) p n
 (25 ) S
 (TrackerServer.java..) k
-( sheets  25 to  25 \( 1\) pages  28- 28   22 lines) p n
+( sheets  25 to  25 \( 1\) pages  28- 28   23 lines) p n
 (26 ) S
 (bin.................) k
 ( sheets  25 to  25 \( 1\) pages  28- 28    1 lines) p n
 (27 ) S
-(bin) k n
-(................) S
-( sheets  25 to  25 \( 1\) pages  28- 28    1 lines) p n
-(28 ) S
 (build.bat...........) k
 ( sheets  26 to  26 \( 1\) pages  29- 29    8 lines) p n
-(29 ) S
+(28 ) S
 (build.sh............) k
 ( sheets  27 to  27 \( 1\) pages  30- 30    7 lines) p n
-(30 ) S
+(29 ) S
 (manifest.txt........) k
 ( sheets  28 to  28 \( 1\) pages  31- 31    3 lines) p n
-(31 ) S
+(30 ) S
 (CallBackHandler.java) k
 ( sheets  29 to  29 \( 1\) pages  32- 32   36 lines) p n
-(32 ) S
+(31 ) S
 (ICallback.java......) k
 ( sheets  30 to  30 \( 1\) pages  33- 33    8 lines) p n
-(33 ) S
+(32 ) S
 (IService.java.......) k
 ( sheets  31 to  31 \( 1\) pages  34- 34    5 lines) p n
-(34 ) S
+(33 ) S
 (IServiceInterface.java) k
 ( sheets  32 to  32 \( 1\) pages  35- 35    9 lines) p n
-(35 ) S
+(34 ) S
 (IServiceNode.java...) k
 ( sheets  33 to  33 \( 1\) pages  36- 36   10 lines) p n
-(36 ) S
+(35 ) S
 (Server.java.........) k
-( sheets  34 to  34 \( 1\) pages  37- 37   55 lines) p n
-(37 ) S
+( sheets  34 to  34 \( 1\) pages  37- 37   61 lines) p n
+(36 ) S
 (ServerService.java..) k
-( sheets  35 to  35 \( 1\) pages  38- 38   47 lines) p n
-(38 ) S
+( sheets  35 to  35 \( 1\) pages  38- 38   53 lines) p n
+(37 ) S
 (ServiceImageAnalytics.java) k
-( sheets  36 to  36 \( 1\) pages  39- 40   76 lines) p n
-(39 ) S
+( sheets  36 to  36 \( 1\) pages  39- 40   86 lines) p n
+(38 ) S
 (ServiceImageAnalyticsGraph.java) k
-( sheets  37 to  37 \( 1\) pages  41- 41   33 lin) p n
+( sheets  37 to  37 \( 1\) pages  41- 41   39 lin) p n
 (es) N
-(40 ) S
+(39 ) S
 (ServiceImpl.java....) k
-( sheets  38 to  38 \( 1\) pages  42- 43   84 lines) p n
-(41 ) S
+( sheets  38 to  38 \( 1\) pages  42- 43  107 lines) p n
+(40 ) S
 (ServiceNode.java....) k
 ( sheets  39 to  39 \( 1\) pages  44- 44   25 lines) p n
-(42 ) S
+(41 ) S
 (ServiceVideoAnalytics.java) k
-( sheets  40 to  41 \( 2\) pages  45- 47  155 lines) p n
-(43 ) S
+( sheets  40 to  41 \( 2\) pages  45- 47  163 lines) p n
+(42 ) S
 (ServiceVideoSplit.java) k
-( sheets  42 to  42 \( 1\) pages  48- 48   61 lines) p n
-(44 ) S
+( sheets  42 to  42 \( 1\) pages  48- 49   66 lines) p n
+(43 ) S
 (TrackerInterface.java) k
-( sheets  43 to  43 \( 1\) pages  49- 49   13 lines) p n
-(45 ) S
+( sheets  43 to  43 \( 1\) pages  50- 50   13 lines) p n
+(44 ) S
 (bin.................) k
-( sheets  43 to  43 \( 1\) pages  49- 49    1 lines) p n
-(46 ) S
+( sheets  43 to  43 \( 1\) pages  50- 50    1 lines) p n
+(45 ) S
 (build.bat...........) k
-( sheets  44 to  44 \( 1\) pages  50- 50    8 lines) p n
-(47 ) S
+( sheets  44 to  44 \( 1\) pages  51- 51    8 lines) p n
+(46 ) S
 (build.sh............) k
-( sheets  45 to  45 \( 1\) pages  51- 51    7 lines) p n
-(48 ) S
+( sheets  45 to  45 \( 1\) pages  52- 52    7 lines) p n
+(47 ) S
 (manifest.txt........) k
-( sheets  46 to  46 \( 1\) pages  52- 52    3 lines) p n
-(Table of Content) (Page 1/1) (Dec 05, 18 18:53) title
+( sheets  46 to  46 \( 1\) pages  53- 53    3 lines) p n
+(Table of Content) (Page 1/1) (Dec 05, 18 19:29) title
 border
 grestore
 (Printed by ) rhead

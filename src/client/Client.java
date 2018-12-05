@@ -10,13 +10,14 @@ public class Client {
   static TrackerHandler trackerHandler;
   static CallbackEvent cbe;
   static Properties p;
+
   public static void main(String[] args) {
-    System.setProperty("java.rmi.server.useLocalHostname","true");
     p = new Properties();
     File file = new File("client.config.properties");
     if (!file.exists()) {
       try {
         System.out.println("Cant find properties file. Writing default.");
+        // Load default config
         FileOutputStream out = new FileOutputStream("client.config.properties");
         p.put("trackers", "localhost:1099");
         p.put("rmi_registry_host", "localhost");
@@ -29,6 +30,7 @@ public class Client {
       }
     } else {
       try {
+        // Load config
         FileInputStream in = new FileInputStream("client.config.properties");
         p.load(in);
       } catch (Exception e) {
@@ -38,19 +40,23 @@ public class Client {
       }
     }
     try {
+      // Parse RMI Registry port
       int port = Integer.parseInt(p.get("rmi_registry_port").toString());
+      // Create a local registry for callback so user does not need to
       r = LocateRegistry.createRegistry(port);
     } catch (Exception e) {
       e.printStackTrace();
       return;
     }
-    cbe = new CallbackEvent();
     // Setup callback
+    cbe = new CallbackEvent();
     new CallbackServer(p, cbe).start();
+    // Setup tracker connection
     trackerHandler = new TrackerHandler(p);
     if (!trackerHandler.Init()) {
-      return;
+      System.exit(1);
     }
+    // Run job
     new ClientJobVideoAnalytics(trackerHandler, cbe).run();
   }
 }

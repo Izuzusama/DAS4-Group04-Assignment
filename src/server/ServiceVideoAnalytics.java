@@ -9,13 +9,14 @@ class ServiceVideoAnalytics implements IService {
     throw new Exception("This is not implemented. Please use byte[][] variant.");
   }
 
-  // data = video file
-  // data2 = filename
+  // data[0] = video file
+  // data2[0] = filename
   public byte[][] run(byte[][] data, String[] data2) throws Exception {
     // Setup all service nodes first before executing
     ArrayList<IServiceInterface> videoSplitNode = GetServices("VideoSplit", 1);
     ArrayList<IServiceInterface> imageAnalyticsNode = GetServices("ImageAnalytics", 4);
     ArrayList<IServiceInterface> imageAnalyticsGraphNode = GetServices("ImageAnalyticsGraph", 1);
+    // If one of the service have no node, tell throw error
     if (videoSplitNode == null || imageAnalyticsNode == null || imageAnalyticsGraphNode == null) {
       System.err.println("Unable to find one of the node.");
       throw new Exception("Unable to find one of the node.");
@@ -26,6 +27,7 @@ class ServiceVideoAnalytics implements IService {
     return new byte[][]{graphImg};
   }
 
+  // Call the split video service node
   private byte[][] GenerateVideoThumb(byte[] data, String filename, IServiceInterface service) throws Exception {
     byte[][] fileBytes;
     try {
@@ -37,6 +39,7 @@ class ServiceVideoAnalytics implements IService {
     return fileBytes;
   }
 
+  // Split the task to (max of 4) nodes 
   private byte[] ImageAnalytics(byte[][] files, ArrayList<IServiceInterface> services) throws Exception {
     ArrayList<byte[]>[] splitedFiles = SplitFiles(files, services.size());
     Thread[] threads = new Thread[services.size()];
@@ -45,6 +48,7 @@ class ServiceVideoAnalytics implements IService {
       final int index = i;
       final ArrayList<byte[]> filesToRun = splitedFiles[i];
       final IServiceInterface serviceToRunAt = services.get(i);
+      // Create threads for each service to call. so can simultaneous calls
       Thread t = new Thread(() -> {
         byte[][] bts = new byte[filesToRun.size()][];
         for (int y = 0; y < filesToRun.size(); y++) {
@@ -65,6 +69,7 @@ class ServiceVideoAnalytics implements IService {
       t.start();
       threads[i] = t;
     }
+    // Wait for all nodes to finish
     for (int i = 0; i < threads.length; i++) {
       try {
         threads[i].join();
@@ -73,6 +78,7 @@ class ServiceVideoAnalytics implements IService {
         throw e;
       }
     }
+    // Combine the result of all nodes
     StringBuilder sb = new StringBuilder();
     Map<String, Integer> nameToOccurance = new HashMap<>();
     for (int i = 0; i < result.length; i++) {
@@ -103,6 +109,7 @@ class ServiceVideoAnalytics implements IService {
     return sb.toString().getBytes();
   }
 
+  // Call the Graph node
   private byte[] GraphIt(byte[] nameToOccuranceCsv, IServiceInterface service) throws Exception{
     byte[][] fileBytes;
     try {
@@ -114,6 +121,7 @@ class ServiceVideoAnalytics implements IService {
     return fileBytes[0];
   }
 
+  // Split files to nodes
   private ArrayList<byte[]>[] SplitFiles(byte[][] files, int parts) {
     ArrayList<byte[]>[] splitedFiles = new ArrayList[parts];
     for (int i = 0; i < parts; i++) {

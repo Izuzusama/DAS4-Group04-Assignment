@@ -9,6 +9,7 @@ public class Tracker {
   static Registry r;
   public static void main(String[] args) {
     Properties p = new Properties();
+    // Load the config
     File file = new File("tracker.config.properties");
     if (!file.exists()) {
       try {
@@ -23,6 +24,7 @@ public class Tracker {
       }
     } else {
       try {
+        // If cant load config
         FileInputStream in = new FileInputStream("tracker.config.properties");
         p.load(in);
       } catch (Exception e) {
@@ -32,12 +34,15 @@ public class Tracker {
       }
     }
     try {
+      // Parse RMI Registry port
       int port = Integer.parseInt(p.get("rmi_registry_port").toString());
+      // Create a local registry so user does not need to
       r = LocateRegistry.createRegistry(port);
     } catch (Exception e) {
       e.printStackTrace();
       return;
     }
+    // Start tracker server
     new TrackerServer(p).start();
   }
 }

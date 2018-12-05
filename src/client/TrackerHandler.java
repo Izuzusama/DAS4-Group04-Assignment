@@ -15,8 +15,10 @@ public class TrackerHandler {
   }
 
   public Boolean Init() {
+    // Get all trackers from properties
     String[] trackerHosts = p.get("trackers").toString().split(",");
     trackers = new ArrayList<>();
+    // Loop through all tracker and find all tracker that is available
     for (int i = 0; i < trackerHosts.length; i++) {
       String tracker = trackerHosts[i];
       try {
@@ -40,6 +42,7 @@ public class TrackerHandler {
   }
 
   public IServiceNode[] Query(String service) {
+    // Loop through all tracker and find one that can return the wanted service
     for (TrackerInterface tracker : trackers) {
       try {
         IServiceNode[] serviceNodes = (IServiceNode[])tracker.GetMeService(service);

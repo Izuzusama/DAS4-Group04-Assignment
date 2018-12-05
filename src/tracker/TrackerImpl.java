@@ -21,19 +21,22 @@ class TrackerImpl extends java.rmi.server.UnicastRemoteObject implements Tracker
   private void Log(String log) {
     System.out.println(log);
   }
-  
+  // Register a server as a service
   public Boolean RegisterMeAsService(String[] services, int port, String ipAddr) throws RemoteException {
     Log(MessageFormat.format("Request: {0}", ipAddr));
+    // Loop trough all service current service node. If the ip already registered.
     for (IServiceNode sn : serviceNodes) {
       if (sn.getIp().equals(ipAddr)) {
-        Log(MessageFormat.format("IP: {0} already added", ipAddr));
+        Log(MessageFormat.format("IP: {0} already added.", ipAddr));
         return false;
       }
     }
+    // Create a new service node
     ServiceNode serviceNode = new ServiceNode();
     serviceNode.Ip = ipAddr;
     serviceNode.Services = services;
     serviceNode.Port = port;
+    // Make Map
     for (String s : services) {
       ArrayList<IServiceNode> sn = serviceDict.get(s);
       if (sn == null) {
@@ -46,13 +49,14 @@ class TrackerImpl extends java.rmi.server.UnicastRemoteObject implements Tracker
     serviceNodes.add(serviceNode);
     return true;
   }
-
+  // Return all serviceNodes that matches the service requested
   public IServiceNode[] GetMeService(String service) throws RemoteException{
     ArrayList<IServiceNode> sn = serviceDict.get(service);
     if(sn == null) return new IServiceNode[0];
     return sn.toArray(new IServiceNode[sn.size()]);
   }
 
+  // Return all serviceNodes that matches the service requested
   public IServiceNode[] GetMeServices(String[] services) throws RemoteException {
     ArrayList<IServiceNode> sns = new ArrayList<>();
     for (String s : services) {
@@ -64,6 +68,7 @@ class TrackerImpl extends java.rmi.server.UnicastRemoteObject implements Tracker
     return MergeServiceNodes(sns);
   }
 
+  // Delist the serviceNode that matches the ipAddress
   public Boolean RemoveMe(String ipAddr) throws RemoteException, ServerNotActiveException {
     IServiceNode removeNode = null;
     for (IServiceNode sn : serviceNodes) {

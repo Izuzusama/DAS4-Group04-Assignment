@@ -50,6 +50,7 @@ File: server.config.properties
 | tracker                   | The tracker server                                                                                                           | localhost\:1099                                              |
 | rmi_registry_port         | The server rmi registry port                                                                                                 | 1000                                                         |
 | rmi_registry_host         | The server rmi registry host/IP                                                                                              | localhost                                                    |
+| ffmpeg_command            | The server ffmpeg command to run. Not needed if not providing VideoSplitService.                                             | ./ffmpeg                                                     |
 
 ### Client
 
