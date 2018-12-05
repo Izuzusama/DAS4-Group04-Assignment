@@ -16,7 +16,7 @@
 
 1. java >1.8
 2. Make sure that java and javac is in path
-3. Tensor flow (if want to run with simulation off)
+3. Tensor flow (if want to run with simulation off) (Installation instruction is below)
 
 ## Build
 
@@ -24,7 +24,8 @@
 
 ## Install Tensor flow models
 
-One of the service provided is to run Tensor Flow Object Detection. This will require the tensor flow pre-trained models and labels. To download them run `download_models.ps1`. To save time, you can also turn on simulation so that the it does not actually run the tensor flow command but return a hard coded value. See configuration below to find out how to turn it on.
+If you pull from github, no download is needed. Skip all step to [Run](#run) section.
+One of the service provided is to run Tensor Flow Object Detection. This will require the tensor flow pre-trained models and labels. To download them run `download_models.ps1` or `download_models.sh`. To save time, you can also turn on simulation so that the it does not actually run the tensor flow command but return a hard coded value. See configuration below to find out how to turn it on.
 
 ## Configuration
 
@@ -49,6 +50,7 @@ File: server.config.properties
 | tracker                   | The tracker server                                                                                                           | localhost\:1099                                              |
 | rmi_registry_port         | The server rmi registry port                                                                                                 | 1000                                                         |
 | rmi_registry_host         | The server rmi registry host/IP                                                                                              | localhost                                                    |
+| ffmpeg_command            | The server ffmpeg command to run. Not needed if not providing VideoSplitService.                                             | ./ffmpeg                                                     |
 
 ### Client
 
@@ -62,11 +64,12 @@ File: server.config.properties
 ## Run
 
 ### Run Tracker
-
 Go to `bin\tracker` and run `java -jar tracker.jar` in command line / terminal
 
+### Run Server
 Go to `bin\server` and run `java -cp server.jar;xchart-3.5.2.jar Server` for windows in command line. Run `java -cp server.jar:xchart-3.5.2.jar Server` for linux in terminal
 
+### Run Client
 Go to `bin\client` and run `java -jar client.jar` in command line / terminal
 
 # Acknowledgements & License

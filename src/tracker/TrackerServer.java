@@ -11,6 +11,7 @@ public class TrackerServer {
   }
   public void start() {
     try {
+      // Register tracker instance
       t = new TrackerImpl();
       System.out.println("Server Ready");
       Naming.rebind(MessageFormat.format("rmi://localhost:{0}/TrackerService", p.get("rmi_registry_port")), t);

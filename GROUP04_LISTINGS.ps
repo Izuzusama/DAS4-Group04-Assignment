@@ -1,0 +1,5538 @@
+%!PS-Adobe-3.0
+%%Title: build.bat, build.sh, download_models.ps1, download_models.sh, README.md, Callback.java, CallbackServer.java, Client.java, ClientJobVideoAnalytics.java, ICallback.java
+%%For: 
+%%Creator: a2ps version 4.14
+%%CreationDate: Wed Dec  5 19:29:10 2018
+%%BoundingBox: 24 24 571 818
+%%DocumentData: Clean7Bit
+%%Orientation: Landscape
+%%Pages: 47
+%%PageOrder: Ascend
+%%DocumentMedia: A4 595 842 0 () ()
+%%DocumentNeededResources: font Courier
+%%+ font Courier-Bold
+%%+ font Courier-BoldOblique
+%%+ font Courier-Oblique
+%%+ font Helvetica
+%%+ font Helvetica-Bold
+%%+ font Symbol
+%%+ font Times-Bold
+%%+ font Times-Roman
+%%DocumentProcessColors: Black 
+%%DocumentSuppliedResources: procset a2ps-a2ps-hdr
+%%+ procset a2ps-black+white-Prolog
+%%+ encoding ISO-8859-1Encoding
+%%EndComments
+/a2psdict 200 dict def
+a2psdict begin
+%%BeginProlog
+%%Copyright: (c) 1988, 89, 90, 91, 92, 93 Miguel Santana
+%%Copyright: (c) 1995, 96, 97, 98 Akim Demaille, Miguel Santana
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+
+% EPSF import as in the Red Book
+/BeginInclude {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack 
+  userdict begin
+    0 setgray 0 setlinecap
+    1 setlinewidth 0 setlinejoin
+    10 setmiterlimit [ ] 0 setdash newpath
+    gs_languagelevel 1 ne {
+      false setstrokeadjust false setoverprint 
+    } if
+} bind def
+
+/EndInclude {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+/BeginEPSF {
+  BeginInclude
+  /showpage { } def
+} bind def
+
+/EndEPSF {
+  EndInclude
+} bind def
+
+% Page prefeed
+/page_prefeed {         % bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} bind def
+
+/deffont {
+  findfont exch scalefont def
+} bind def
+
+/reencode_font {
+  findfont reencode 2 copy definefont pop def
+} bind def
+
+% Function c-show (str => -)
+% centers text only according to x axis.
+/c-show { 
+  dup stringwidth pop
+  2 div neg 0 rmoveto
+  show
+} bind def
+
+% Function l-show (str => -)
+% prints texts so that it ends at currentpoint
+/l-show {
+  dup stringwidth pop neg 
+  0 
+  rmoveto show
+} bind def
+
+% center-fit show (str w => -)
+% show centered, and scale currentfont so that the width is less than w
+/cfshow {
+  exch dup stringwidth pop
+  % If the title is too big, try to make it smaller
+  3 2 roll 2 copy
+  gt
+  { % if, i.e. too big
+    exch div
+    currentfont exch scalefont setfont
+  } { % ifelse
+    pop pop 
+  }
+  ifelse
+  c-show			% center title
+} bind def
+
+% Return the y size of the current font
+% - => fontsize
+/currentfontsize {
+  currentfont /FontType get 0 eq {
+    currentfont /FontMatrix get 3 get
+  }{
+    currentfont /FontMatrix get 3 get 1000 mul
+  } ifelse
+} bind def
+
+% reencode the font
+% <encoding-vector> <fontdict> -> <newfontdict>
+/reencode { %def
+  dup length 5 add dict begin
+    { %forall
+      % <vector> <key> <val>
+      1 index /FID ne 
+      { def }{ pop pop } ifelse
+    } forall
+    /Encoding exch def % -
+
+    % Use the font's bounding box to determine the ascent, descent,
+    % and overall height; don't forget that these values have to be
+    % transformed using the font's matrix.
+    % We use `load' because sometimes BBox is executable, sometimes not.
+    % Since we need 4 numbers an not an array avoid BBox from being executed
+    /FontBBox load aload pop
+    FontMatrix transform /Ascent exch def pop
+    FontMatrix transform /Descent exch def pop
+    /FontHeight Ascent Descent sub def
+
+    % Get the underline position and thickness if they're defined.
+    % Use 1 if they are not defined.
+    currentdict /FontInfo 2 copy known
+    { get
+      /UnderlinePosition 2 copy % <FontInfo> /UP <FontInfo> /UP
+      2 copy known
+      { get }{ pop pop 1 } ifelse
+      0 exch FontMatrix transform exch pop
+      def % <FontInfo>
+
+      /UnderlineThickness 2 copy % <FontInfo> /UT <FontInfo> /UT
+      2 copy known
+      { get }{ pop pop 1 } ifelse
+      0 exch FontMatrix transform exch pop
+      def % <FontInfo>
+      pop % -
+    }{ pop pop
+    } ifelse
+
+    currentdict
+  end 
+} bind def
+
+% composite fonts for ASCII-EUC mixed strings
+% Version 1.2 1/31/1990
+% Original Ken'ichi HANDA (handa@etl.go.jp)
+% Modified Norio Katayama (katayama@rd.nacsis.ac.jp),1998
+% Extend & Fix Koji Nakamaru (maru@on.cs.keio.ac.jp), 1999
+% Anyone can freely copy, modify, distribute this program.
+
+/copyfont {	% font-dic extra-entry-count  copyfont  font-dic
+	1 index maxlength add dict begin
+	{	1 index /FID ne 2 index /UniqueID ne and
+		{def} {pop pop} ifelse
+	} forall
+	currentdict
+	end
+} bind def
+
+/compositefont { % ASCIIFontName EUCFontName RomanScale RomanOffset Rot(T/F) compositefont font
+    /RomanRotation exch def
+    /RomanOffset exch def
+    /RomanScale exch def
+    userdict /fixeucfont_dict known not {
+	userdict begin
+	    /fixeucfont_dict 2 dict begin
+		/UpperByteEncoding [
+		    16#00 1 16#20 { pop 0 } for
+		    16#21 1 16#28 { 16#20 sub } for
+		    16#29 1 16#2F { pop 0 } for
+		    16#30 1 16#74 { 16#27 sub } for
+		    16#75 1 16#FF { pop 0 } for
+		] def
+	        /LowerByteEncoding [
+		    16#00 1 16#A0 { pop /.notdef } for
+		    16#A1 1 16#FE { 16#80 sub 16 2 string cvrs
+				    (cXX) dup 1 4 -1 roll
+				    putinterval cvn } for
+		    /.notdef
+		] def
+		currentdict
+	    end def
+	end
+    } if
+    findfont dup /FontType get 0 eq {
+	14 dict begin
+	    %
+	    % 7+8 bit EUC font
+	    %
+	    12 dict begin
+		/EUCFont exch def
+		/FontInfo (7+8 bit EUC font) readonly def
+		/PaintType 0 def
+		/FontType 0 def
+		/FontMatrix matrix def
+		% /FontName
+		/Encoding fixeucfont_dict /UpperByteEncoding get def
+		/FMapType 2 def
+		EUCFont /WMode known
+		{ EUCFont /WMode get /WMode exch def }
+		{ /WMode 0 def } ifelse
+		/FDepVector [
+		    EUCFont /FDepVector get 0 get
+		    [ 16#21 1 16#28 {} for 16#30 1 16#74 {} for ]
+		    {
+			13 dict begin
+			    /EUCFont EUCFont def
+			    /UpperByte exch 16#80 add def	
+			    % /FontName
+			    /FontInfo (EUC lower byte font) readonly def
+			    /PaintType 0 def
+			    /FontType 3 def
+			    /FontMatrix matrix def
+			    /FontBBox {0 0 0 0} def
+			    /Encoding
+				fixeucfont_dict /LowerByteEncoding get def
+			    % /UniqueID
+			    % /WMode
+			    /BuildChar {
+				gsave
+				exch dup /EUCFont get setfont
+				/UpperByte get
+				2 string
+				dup 0 4 -1 roll put
+				dup 1 4 -1 roll put
+				dup stringwidth setcharwidth
+				0 0 moveto show
+				grestore
+			    } bind def
+			    currentdict
+			end
+			/lowerbytefont exch definefont
+		    } forall
+		] def
+		currentdict
+	    end
+	    /eucfont exch definefont
+	    exch
+	    findfont 1 copyfont dup begin
+		RomanRotation {
+			/FontMatrix FontMatrix
+			[ 0 RomanScale neg RomanScale 0 RomanOffset neg 0 ]
+			matrix concatmatrix def
+		}{
+			/FontMatrix FontMatrix
+			[ RomanScale 0 0 RomanScale 0 RomanOffset ] matrix concatmatrix
+			def
+			/CDevProc
+			    {pop pop pop pop 0 exch -1000 exch 2 div 880} def
+		} ifelse
+	    end
+	    /asciifont exch definefont
+	    exch
+	    /FDepVector [ 4 2 roll ] def
+	    /FontType 0 def
+	    /WMode 0 def
+	    /FMapType 4 def
+	    /FontMatrix matrix def
+	    /Encoding [0 1] def
+	    /FontBBox {0 0 0 0} def
+%	    /FontHeight 1.0 def % XXXX
+	    /FontHeight RomanScale 1.0 ge { RomanScale }{ 1.0 } ifelse def
+	    /Descent -0.3 def   % XXXX
+	    currentdict
+	end
+	/tmpfont exch definefont
+	pop
+	/tmpfont findfont
+    }{
+	pop findfont 0 copyfont
+    } ifelse
+} def	
+
+/slantfont {	% FontName slant-degree  slantfont  font'
+    exch findfont 1 copyfont begin
+    [ 1 0 4 -1 roll 1 0 0 ] FontMatrix exch matrix concatmatrix
+    /FontMatrix exch def
+    currentdict
+    end
+} def
+
+% Function print line number (<string> # -)
+/# {
+  gsave
+    sx cw mul neg 2 div 0 rmoveto
+    f# setfont
+    c-show
+  grestore
+} bind def
+
+% -------- Some routines to enlight plain b/w printings ---------
+
+% Underline
+% width --
+/dounderline {
+  currentpoint
+  gsave
+    moveto
+    0 currentfont /Descent get currentfontsize mul rmoveto
+    0 rlineto
+    stroke
+  grestore
+} bind def
+
+% Underline a string
+% string --
+/dounderlinestring {
+  stringwidth pop
+  dounderline
+} bind def
+
+/UL {
+  /ul exch store
+} bind def
+
+% Draw a box of WIDTH wrt current font
+% width --
+/dobox {
+  currentpoint
+  gsave
+    newpath
+    moveto
+    0 currentfont /Descent get currentfontsize mul rmoveto
+    dup 0 rlineto
+    0 currentfont /FontHeight get currentfontsize mul rlineto
+    neg 0 rlineto
+    closepath
+    stroke
+  grestore
+} bind def
+
+/BX {
+  /bx exch store
+} bind def
+
+% Box a string
+% string --
+/doboxstring {
+  stringwidth pop
+  dobox
+} bind def
+
+%
+% ------------- Color routines ---------------
+%
+/FG /setrgbcolor load def
+
+% Draw the background
+% width --
+/dobackground {
+  currentpoint
+  gsave
+    newpath
+    moveto
+    0 currentfont /Descent get currentfontsize mul rmoveto
+    dup 0 rlineto
+    0 currentfont /FontHeight get currentfontsize mul rlineto
+    neg 0 rlineto
+    closepath
+    bgcolor aload pop setrgbcolor
+    fill
+  grestore
+} bind def
+
+% Draw bg for a string
+% string --
+/dobackgroundstring {
+  stringwidth pop
+  dobackground
+} bind def
+
+
+/BG {
+  dup /bg exch store
+  { mark 4 1 roll ] /bgcolor exch store } if
+} bind def
+
+
+/Show {
+  bg { dup dobackgroundstring } if
+  ul { dup dounderlinestring } if
+  bx { dup doboxstring } if
+  show
+} bind def
+
+% Function T(ab), jumps to the n-th tabulation in the current line
+/T {
+  cw mul x0 add
+  bg { dup currentpoint pop sub dobackground } if
+  ul { dup currentpoint pop sub dounderline } if
+  bx { dup currentpoint pop sub dobox } if
+  y0 moveto
+} bind def
+
+% Function n: move to the next line
+/n {
+  /y0 y0 bfs sub store
+  x0 y0 moveto
+} bind def
+
+% Function N: show and move to the next line
+/N {
+  Show
+  /y0 y0 bfs sub store
+  x0 y0 moveto
+} bind def
+
+/S {
+  Show
+} bind def
+
+%%BeginResource: procset a2ps-a2ps-hdr 2.0 2
+%%Copyright: (c) 1988, 89, 90, 91, 92, 93 Miguel Santana
+%%Copyright: (c) 1995, 96, 97, 98 Akim Demaille, Miguel Santana
+% Function title: prints page header.
+% <ct> <rt> <lt> are passed as argument
+/title { 
+  % 1. Draw the background
+  x v get y v get moveto
+  gsave
+    0 th 2 div neg rmoveto 
+    th setlinewidth
+    0.95 setgray
+    pw 0 rlineto stroke
+  grestore
+  % 2. Border it
+  gsave
+    0.7 setlinewidth
+    pw 0 rlineto
+    0 th neg rlineto
+    pw neg 0 rlineto
+    closepath stroke
+  grestore
+  % stk: ct rt lt
+  x v get y v get th sub 1 add moveto
+%%IncludeResource: font Helvetica
+  fHelvetica fnfs 0.8 mul scalefont setfont
+  % 3. The left title
+  gsave
+    dup stringwidth pop fnfs 0.8 mul add exch % leave space took on stack
+    fnfs 0.8 mul hm rmoveto
+    show			% left title
+  grestore
+  exch
+  % stk: ct ltw rt
+  % 4. the right title
+  gsave
+    dup stringwidth pop fnfs 0.8 mul add exch % leave space took on stack
+    dup
+    pw exch stringwidth pop fnfs 0.8 mul add sub
+    hm
+    rmoveto
+    show			% right title
+  grestore
+  % stk: ct ltw rtw
+  % 5. the center title
+  gsave
+    pw 3 1 roll
+    % stk: ct pw ltw rtw
+    3 copy 
+    % Move to the center of the left room
+    sub add 2 div hm rmoveto
+    % What is the available space in here?
+    add sub fnfs 0.8 mul sub fnfs 0.8 mul sub
+    % stk: ct space_left
+%%IncludeResource: font Helvetica-Bold
+  fHelvetica-Bold fnfs scalefont setfont
+    cfshow
+  grestore
+} bind def
+
+% Function border: prints virtual page border
+/border { %def
+  gsave				% print four sides
+    0 setgray
+    x v get y v get moveto
+    0.7 setlinewidth		% of the square
+    pw 0 rlineto
+    0 ph neg rlineto
+    pw neg 0 rlineto
+    closepath stroke
+  grestore
+} bind def
+
+% Function water: prints a water mark in background
+/water { %def
+  gsave
+    scx scy moveto rotate
+%%IncludeResource: font Times-Bold
+  fTimes-Bold 100 scalefont setfont
+    .97 setgray
+    dup stringwidth pop 2 div neg -50 rmoveto
+    show
+  grestore
+} bind def
+
+% Function rhead: prints the right header
+/rhead {  %def
+  lx ly moveto
+  fHelvetica fnfs 0.8 mul scalefont setfont
+  l-show
+} bind def
+
+% Function footer (cf rf lf -> -)
+/footer {
+  fHelvetica fnfs 0.8 mul scalefont setfont
+  dx dy moveto
+  show
+
+  snx sny moveto
+  l-show
+  
+  fnx fny moveto
+  c-show
+} bind def
+%%EndResource
+%%BeginResource: procset a2ps-black+white-Prolog 2.0 1
+
+% Function T(ab), jumps to the n-th tabulation in the current line
+/T { 
+  cw mul x0 add y0 moveto
+} bind def
+
+% Function n: move to the next line
+/n { %def
+  /y0 y0 bfs sub store
+  x0 y0 moveto
+} bind def
+
+% Function N: show and move to the next line
+/N {
+  Show
+  /y0 y0 bfs sub store
+  x0 y0 moveto
+}  bind def
+
+/S {
+  Show
+} bind def
+
+/p {
+  false UL
+  false BX
+  fCourier bfs scalefont setfont
+  Show
+} bind def
+
+/sy {
+  false UL
+  false BX
+  fSymbol bfs scalefont setfont
+  Show
+} bind def
+
+/k {
+  false UL
+  false BX
+  fCourier-Oblique bfs scalefont setfont
+  Show
+} bind def
+
+/K {
+  false UL
+  false BX
+  fCourier-Bold bfs scalefont setfont
+  Show
+} bind def
+
+/c {
+  false UL
+  false BX
+  fCourier-Oblique bfs scalefont setfont
+  Show
+} bind def
+
+/C {
+  false UL
+  false BX
+  fCourier-BoldOblique bfs scalefont setfont
+  Show 
+} bind def
+
+/l {
+  false UL
+  false BX
+  fHelvetica bfs scalefont setfont
+  Show
+} bind def
+
+/L {
+  false UL
+  false BX
+  fHelvetica-Bold bfs scalefont setfont
+  Show 
+} bind def
+
+/str{
+  false UL
+  false BX
+  fTimes-Roman bfs scalefont setfont
+  Show
+} bind def
+
+/e{
+  false UL
+  true BX
+  fHelvetica-Bold bfs scalefont setfont
+  Show
+} bind def
+
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier
+%%IncludeResource: font Courier-Oblique
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Times-Roman
+%%IncludeResource: font Symbol
+%%IncludeResource: font Courier-BoldOblique
+%%BeginResource: encoding ISO-8859-1Encoding
+/ISO-8859-1Encoding [
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 
+/space /exclam /quotedbl /numbersign /dollar /percent /ampersand /quoteright 
+/parenleft /parenright /asterisk /plus /comma /minus /period /slash 
+/zero /one /two /three /four /five /six /seven 
+/eight /nine /colon /semicolon /less /equal /greater /question 
+/at /A /B /C /D /E /F /G 
+/H /I /J /K /L /M /N /O 
+/P /Q /R /S /T /U /V /W 
+/X /Y /Z /bracketleft /backslash /bracketright /asciicircum /underscore 
+/quoteleft /a /b /c /d /e /f /g 
+/h /i /j /k /l /m /n /o 
+/p /q /r /s /t /u /v /w 
+/x /y /z /braceleft /bar /braceright /asciitilde /.notdef 
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 
+/.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef /.notdef 
+/space /exclamdown /cent /sterling /currency /yen /brokenbar /section 
+/dieresis /copyright /ordfeminine /guillemotleft /logicalnot /hyphen /registered /macron 
+/degree /plusminus /twosuperior /threesuperior /acute /mu /paragraph /bullet 
+/cedilla /onesuperior /ordmasculine /guillemotright /onequarter /onehalf /threequarters /questiondown 
+/Agrave /Aacute /Acircumflex /Atilde /Adieresis /Aring /AE /Ccedilla 
+/Egrave /Eacute /Ecircumflex /Edieresis /Igrave /Iacute /Icircumflex /Idieresis 
+/Eth /Ntilde /Ograve /Oacute /Ocircumflex /Otilde /Odieresis /multiply 
+/Oslash /Ugrave /Uacute /Ucircumflex /Udieresis /Yacute /Thorn /germandbls 
+/agrave /aacute /acircumflex /atilde /adieresis /aring /ae /ccedilla 
+/egrave /eacute /ecircumflex /edieresis /igrave /iacute /icircumflex /idieresis 
+/eth /ntilde /ograve /oacute /ocircumflex /otilde /odieresis /divide 
+/oslash /ugrave /uacute /ucircumflex /udieresis /yacute /thorn /ydieresis 
+] def
+%%EndResource
+% Initialize page description variables.
+/sh 595 def
+/sw 842 def
+/llx 24 def
+/urx 818 def
+/ury 571 def
+/lly 24 def
+/#copies 1 def
+/th 15.000000 def
+/fnfs 11 def
+/bfs 8.005733 def
+/cw 4.803440 def
+
+% Dictionary for ISO-8859-1 support
+/iso1dict 8 dict begin
+  /fCourier ISO-8859-1Encoding /Courier reencode_font
+  /fCourier-Bold ISO-8859-1Encoding /Courier-Bold reencode_font
+  /fCourier-BoldOblique ISO-8859-1Encoding /Courier-BoldOblique reencode_font
+  /fCourier-Oblique ISO-8859-1Encoding /Courier-Oblique reencode_font
+  /fHelvetica ISO-8859-1Encoding /Helvetica reencode_font
+  /fHelvetica-Bold ISO-8859-1Encoding /Helvetica-Bold reencode_font
+  /fTimes-Bold ISO-8859-1Encoding /Times-Bold reencode_font
+  /fTimes-Roman ISO-8859-1Encoding /Times-Roman reencode_font
+currentdict end def
+/bgcolor [ 0 0 0 ] def
+/bg false def
+/ul false def
+/bx false def
+% The font for line numbering
+/f# /Helvetica findfont bfs .6 mul scalefont def
+/fSymbol /Symbol findfont def
+/hm fnfs 0.25 mul def
+/pw
+   cw 81.400000 mul
+def
+/ph
+   501.959430 th add
+def
+/pmw urx llx sub pw 2 mul sub 1 div def
+/pmh 0 def
+/v 0 def
+/x [
+  0
+  dup pmw add pw add
+] def
+/y [
+  pmh ph add 0 mul ph add
+  dup
+] def
+/scx sw 2 div def
+/scy sh 2 div def
+/snx urx def
+/sny lly 2 add def
+/dx llx def
+/dy sny def
+/fnx scx def
+/fny dy def
+/lx snx def
+/ly ury fnfs 0.8 mul sub def
+/sx 0 def
+/tab 8 def
+/x0 0 def
+/y0 0 def
+%%EndSetup
+
+%%Page: (1) 1
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(mkdir bin) p n
+(mkdir bin\\tracker) N
+(mkdir bin\\server) N
+(mkdir bin\\client) N
+(cd src\\tracker) N
+(call build.bat) N
+(if %errorlevel% neq 0 exit /b %errorlevel%) N
+(copy bin\\tracker.jar ..\\..\\bin\\tracker\\) N
+(cd ..\\) N
+(cd server) N
+(call build.bat) N
+(if %errorlevel% neq 0 exit /b %errorlevel%) N
+(copy bin\\server.jar ..\\..\\bin\\server\\) N
+(cd ..\\) N
+(cd client) N
+(call build.bat) N
+(if %errorlevel% neq 0 exit /b %errorlevel%) N
+(copy bin\\client.jar ..\\..\\bin\\client\\) N
+(cd ..\\..\\) N
+() N
+(REM Copy Lib files) N
+(copy /Y lib\\*.jar bin\\server\\) N
+(copy /Y tools\\ffmpeg.exe bin\\server\\) S
+(build.bat) (Page 1/1) (Dec 05, 18 12:22) title
+border
+grestore
+(Printed by ) rhead
+(build.bat) (1/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 2
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(set -e) p n
+(mkdir -p bin) N
+(mkdir -p bin/tracker) N
+(mkdir -p bin/server) N
+(mkdir -p bin/client) N
+(cd src/tracker) N
+(./build.sh) N
+(cp bin/tracker.jar ../../bin/tracker/) N
+(cd ../) N
+(cd server) N
+(./build.sh) N
+(cp bin/server.jar ../../bin/server/) N
+(cd ../) N
+(cd client) N
+(./build.sh) N
+(cp bin/client.jar ../../bin/client/) N
+(cd ../../) N
+() N
+(# Copy Lib files) N
+(cp lib) S
+(/*.jar bin/server/) c n
+(cp tools/ffmpeg bin/server/) S
+(build.sh) (Page 1/1) (Dec 05, 18 18:52) title
+border
+grestore
+(Printed by ) rhead
+(build.sh) (2/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 3
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+($ErrorActionPreference = "Stop") p n
+(Import-Module BitsTransfer) N
+(if\(!\(Test-Path -Path "bin\\server\\models\\ssd_inception_v2_coco_2017_11_17\\"\)\){) N
+(  new-item -Name bin\\server\\models -Force -ItemType directory) N
+(  Start-BitsTransfer -Source "http://download.tensorflow.org/models/object_detec) N
+(tion/ssd_inception_v2_coco_2017_11_17.tar.gz" -Destination "ssd_inception_v2_coc) N
+(o_2017_11_17.tar.gz") N
+(  .\\tools\\7za.exe e "ssd_inception_v2_coco_2017_11_17.tar.gz") N
+(  .\\tools\\7za.exe x "ssd_inception_v2_coco_2017_11_17.tar" -obin\\server\\models\\ ) N
+(-r) N
+(  Remove-Item -Path ssd_inception_v2_coco_2017_11_17.tar) N
+(  Remove-Item -Path ssd_inception_v2_coco_2017_11_17.tar.gz) N
+(}) N
+(if\(!\(Test-Path "bin\\server\\labels\\mscoco_label_map.pbtxt" -PathType Leaf\)\){) N
+(  new-item -Name bin\\server\\labels -Force -ItemType directory) N
+(  Start-BitsTransfer -Source "https://raw.githubusercontent.com/tensorflow/model) N
+(s/865c14c1209cb9ae188b2a1b5f0883c72e050d4c/research/object_detection/data/mscoco) N
+(_label_map.pbtxt" -Destination  "bin\\server\\labels\\mscoco_label_map.pbtxt") N
+(}) N
+(if\(!\(Test-Path "bin\\server\\labels\\oid_bbox_trainable_label_map.pbtxt" -PathType ) N
+(Leaf\)\){) N
+(  new-item -Name bin\\server\\labels -Force -ItemType directory) N
+(  Start-BitsTransfer -Source "https://raw.githubusercontent.com/tensorflow/model) N
+(s/865c14c1209cb9ae188b2a1b5f0883c72e050d4c/research/object_detection/data/oid_bb) N
+(ox_trainable_label_map.pbtxt" -Destination  "bin\\server\\labels\\oid_bbox_trainabl) N
+(e_label_map.pbtxt") N
+(}) S
+(download_models.ps1) (Page 1/1) (Dec 04, 18 15:15) title
+border
+grestore
+(Printed by ) rhead
+(download_models.ps1) (3/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 4
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(#!/bin/bash) c n
+(set) K
+( -e) p n
+(if) K
+( [ ! -d ") p
+(bin/server/models/ssd_inception_v2_coco_2017_11_17/) str
+(" ]; ) p
+(then) K n
+(  mkdir -p bin/server/models/) p n
+(  curl -L http://download.tensorflow.org/models/object_detection/ssd_inception_v) N
+(2_coco_2017_11_17.tar.gz | tar -xz -C bin/server/models/) N
+(fi) K n
+(if) S
+( [ ! -f ") p
+(bin/server/labels/mscoco_label_map.pbtxt) str
+(" ]; ) p
+(then) K n
+(  mkdir -p bin/server/labels/) p n
+(  curl -L -o bin/server/labels/mscoco_label_map.pbtxt ") S
+(https://raw.githubusercontent.com/te) str n
+(nsorflow/models/865c14c1209cb9ae188b2a1b5f0883c72e050d4c/research/object_detection/data/mscoco_label_map.p) N
+(btxt) S
+(") p n
+(  curl -L -o bin/server/labels/oid_bbox_trainable_label_map.pbtxt ") S
+(https://raw.githubu) str n
+(sercontent.com/tensorflow/models/865c14c1209cb9ae188b2a1b5f0883c72e050d4c/research/object_detection/data/oid_) N
+(bbox_trainable_label_map.pbtxt) S
+(") p n
+(fi) K
+(download_models.sh) (Page 1/1) (Dec 04, 18 16:03) title
+border
+grestore
+(Printed by ) rhead
+(download_models.sh) (4/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1-2) 5
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(<style>) p n
+(  code{) N
+(    color: #f92672 !important;) N
+(    border: 1px solid hsla\(0, 0%, 89%, 1\);) N
+(    background-color: hsla\(0, 0%, 98%, 1\);) N
+(    font-size: .875rem;) N
+(    border-radius: 2px;) N
+(    display: inline-block;) N
+(    padding: 3px 7px;) N
+(  }) N
+(</style>) N
+() N
+(# Distributed Processing Program) N
+() N
+(## Prerequisite) N
+() N
+(1. java >1.8) N
+(2. Make sure that java and javac is in path) N
+(3. Tensor flow \(if want to run with simulation off\) \(Installation instruction is) N
+( below\)) N
+() N
+(## Build) N
+() N
+(1. Run `build.bat`) N
+() N
+(## Install Tensor flow models) N
+() N
+(If you pull from github, no download is needed. Skip all step to [Run]\(#run\) sec) N
+(tion.) N
+(One of the service provided is to run Tensor Flow Object Detection. This will re) N
+(quire the tensor flow pre-trained models and labels. To download them run `downl) N
+(oad_models.ps1` or `download_models.sh`. To save time, you can also turn on simu) N
+(lation so that the it does not actually run the tensor flow command but return a) N
+( hard coded value. See configuration below to find out how to turn it on.) N
+() N
+(## Configuration) N
+() N
+(If a configuration file is not found. First startup will create default config f) N
+(ile.) N
+() N
+(### Tracker) N
+() N
+(File: tracker.config.properties) N
+(| Config            | Definition       | Default |) N
+(| ----------------- | ---------------- | ------- |) N
+(| rmi_registry_port | Tracker RMI Port | 1099    |) N
+() N
+(### Server) N
+() N
+(File: server.config.properties) N
+(| Config                    | Definition                                        ) N
+(                                                                           | Def) N
+(ault                                                      |) N
+(| ------------------------- | --------------------------------------------------) N
+(-------------------------------------------------------------------------- | ---) N
+(--------------------------------------------------------- |) N
+(| image_analytics_simulate  | Turn simulate on or off see [Install Tensor flow m) N
+(odels]\(#install-Tensor-flow-models\)                                        | 0  ) N
+(                                                          |) N
+(| services                  | Services that this server will provide. Split by c) N
+(omma \(,\)                                                                   | Vid) N
+(eoAnalytics,VideoSplit,ImageAnalytics,ImageAnalyticsGraph |) N
+(README.md) (Page 1/3) (Dec 05, 18 19:00) title
+border
+/v 1 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(| image_analytics_label     | The label file for tensor flow. Not needed if simu) p n
+(lation is 1. Or if the server is not providing ImageAnalyticsService.      | lab) N
+(els/mscoco_label_map.pbtxt                                |) N
+(| image_analytics_model_dir | The model directory for tensor flow. Not needed if) N
+( simulation is 1. Or if the server is not providing ImageAnalyticsService. | mod) N
+(els/ssd_inception_v2_coco_2017_11_17/saved_model          |) N
+(| tracker                   | The tracker server                                ) N
+(                                                                           | loc) N
+(alhost\\:1099                                              |) N
+(| rmi_registry_port         | The server rmi registry port                      ) N
+(                                                                           | 100) N
+(0                                                         |) N
+(| rmi_registry_host         | The server rmi registry host/IP                   ) N
+(                                                                           | loc) N
+(alhost                                                    |) N
+(| ffmpeg_command            | The server ffmpeg command to run. Not needed if no) N
+(t providing VideoSplitService.                                             | ./f) N
+(fmpeg                                                     |) N
+() N
+(### Client) N
+() N
+(File: server.config.properties) N
+(| Config            | Definition                                           | Def) N
+(ault        |) N
+(| ----------------- | ---------------------------------------------------- | ---) N
+(----------- |) N
+(| rmi_registry_port | Callback RMI Registry Port                           | 108) N
+(8           |) N
+(| rmi_registry_host | Callback RMI Registry Host/IP                        | loc) N
+(alhost      |) N
+(| trackers          | Tracker servers to find servers. Comma seperated \(,\) | loc) N
+(alhost:1099 |) N
+() N
+(## Run) N
+() N
+(### Run Tracker) N
+(Go to `bin\\tracker` and run `java -jar tracker.jar` in command line / terminal) N
+() N
+(### Run Server) N
+(Go to `bin\\server` and run `java -cp server.jar;xchart-3.5.2.jar Server` for win) N
+(dows in command line. Run `java -cp server.jar:xchart-3.5.2.jar Server` for linu) N
+(x in terminal) N
+() N
+(### Run Client) N
+(Go to `bin\\client` and run `java -jar client.jar` in command line / terminal) N
+() N
+(# Acknowledgements & License) N
+() N
+(## TensorFlow demo Program) N
+() N
+(The ImageAnalytics potion of the program uses an external jar application to do ) N
+(the analytics. Mainly the TensorFlow demo program that can be found at <https://) N
+(github.com/tensorflow/models/tree/master/samples/languages/java/object_detection) N
+(>) N
+() N
+(Since the jar demo application does not provide an easy way to extract info out,) N
+( we modified the code to output a CSV file. It') S
+(s then package as a standalone JAR file.) str n
+(A copy of the license can be found at lib/detect-object-LICENSE) N
+() N
+(## Xchart) N
+() N
+(The ImageAnalyticsGraph part of the program uses an external library called xchart <https://knowm.org/open-source/x) N
+(README.md) (Page 2/3) (Dec 05, 18 19:00) title
+border
+grestore
+(Printed by ) rhead
+(README.md) (5/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (3) 6
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(chart/>. No modification is made on the source. A copy of the license can be found at lib/xchart-LICENSE) str n
+() N
+(## ffmpeg) N
+() N
+(The VideoSplit part of the program uses an external application called ffmpeg <https://www.ffmpeg.org/> to split vide) N
+(os to multiple images.) N
+() N
+(## 7za) N
+() N
+(No part of the application is using 7za.exe but it is used for the `download_models.ps1` script.) S
+(README.md) (Page 3/3) (Dec 05, 18 19:00) title
+border
+grestore
+(Printed by ) rhead
+(README.md) (6/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 7
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(import) K
+( java.rmi.RemoteException;) p n
+(import) K
+( java.rmi.server.ServerNotActiveException;) p n
+(import) K
+( java.util.HashSet;) p n
+(import) K
+( java.util.Set;) p n
+(import) K
+( java.util.function.Consumer;) p n
+() N
+(public) K
+( ) p
+(class) K
+( ) p
+(Callback) L
+( ) p
+(extends) K
+( java.rmi.server.UnicastRemoteObject ) p
+(implements) K
+( ICal) p n
+(lback {) N
+(  CallbackEvent cbe;) N
+(  Callback\(CallbackEvent cbe\) ) S
+(throws) K
+( RemoteException {) p n
+(    ) S
+(super) K
+(\(\);) p n
+(    this.cbe = cbe;) N
+(  }) N
+() N
+(  ) S
+(public) K
+( ) p
+(void) k
+( NewCallback\(String sn, String[] dt\) ) p
+(throws) K
+( RemoteException{) p n
+(    cbe.broadcast\() S
+(new) K
+( EventArgs\(\){{) p n
+(      serviceName = sn;) N
+(      data = dt;) N
+(      ipAddress = "";) N
+(    }}\);) N
+(  }) N
+(  ) S
+(public) K
+( ) p
+(void) k
+( NewCallback\(String sn, ) p
+(byte) k
+([][] dt\) ) p
+(throws) K
+( RemoteException{) p n
+(    cbe.broadcast\() S
+(new) K
+( EventArgs\(\){{) p n
+(      serviceName = sn;) N
+(      byteData = dt;) N
+(      ipAddress = "";) N
+(    }}\);) N
+(  }) N
+(  ) S
+(public) K
+( ) p
+(void) k
+( NewExceptionCallback\(String sn, Exception ex\){) p n
+(    cbe.broadcast\() S
+(new) K
+( EventArgs\(\){{) p n
+(      serviceName = sn;) N
+(      ipAddress = "";) N
+(      exception = ex;) N
+(    }}\);) N
+(  }) N
+(}) N
+() N
+(class) K
+( ) p
+(EventArgs) L
+( {) p n
+(  String serviceName;) N
+(  String ipAddress;) N
+(  String[] data;) N
+(  ) S
+(byte) k
+([][] byteData;) p n
+(  Exception exception;) N
+(}) N
+() N
+(class) K
+( ) p
+(CallbackEvent{) L n
+(  ) p
+(private) K
+( Set<Consumer<EventArgs>> listeners = ) p
+(new) K
+( HashSet<>\(\);) p n
+() N
+(  ) S
+(public) K
+( ) p
+(void) k
+( addListener\(Consumer<EventArgs> listener\) {) p n
+(    listeners.add\(listener\);) N
+(  }) N
+() N
+(  ) S
+(public) K
+( ) p
+(void) k
+( broadcast\(EventArgs args\) {) p n
+(    listeners.forEach\(x -> x.accept\(args\)\);) N
+(  }) N
+(}) S
+(Callback.java) (Page 1/1) (Dec 05, 18 18:57) title
+border
+grestore
+(Printed by ) rhead
+(src/client/Callback.java) (7/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 8
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(import) K
+( java.rmi.Naming;) p n
+(import) K
+( java.text.MessageFormat;) p n
+(import) K
+( java.util.Properties;) p n
+() N
+(public) K
+( ) p
+(class) K
+( ) p
+(CallbackServer) L
+( {) p n
+(  ICallback cb;) N
+(  Properties p;) N
+(  CallbackEvent cbe;) N
+() N
+(  ) S
+(public) K
+( CallbackServer\(Properties p, CallbackEvent cbe\) {) p n
+(    this.p = p;) N
+(    this.cbe = cbe;) N
+(  }) N
+() N
+(  ) S
+(public) K
+( ) p
+(void) k
+( start\(\) {) p n
+(    ) S
+(try) K
+( {) p n
+(      ) S
+(// Startup the RMI callback server) c n
+(      cb = ) p
+(new) K
+( Callback\(this.cbe\);) p n
+(      System.out.println\(") S
+(Server Ready) str
+("\);) p n
+(      System.setProperty\(") S
+(java.rmi.server.hostname) str
+(", p.getProperty\(") p
+(rmi_registry_host) str
+("\)\);) p n
+(      Naming.rebind\(MessageFormat.format\(") S
+(rmi://{0}:{1}/Callback) str
+(", p.getProperty\(") p
+(rmi_re) str n
+(gistry_host) S
+("\),) p n
+(          p.getProperty\(") S
+(rmi_registry_port) str
+("\)\), cb\);) p n
+(    } ) S
+(catch) K
+( \(Exception e\) {) p n
+(      e.printStackTrace\(\);) N
+(    }) N
+(  }) N
+(}) S
+(CallbackServer.java) (Page 1/1) (Dec 05, 18 19:07) title
+border
+grestore
+(Printed by ) rhead
+(src/client/CallbackServer.java) (8/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 9
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(import) K
+( java.io.File;) p n
+(import) K
+( java.io.FileInputStream;) p n
+(import) K
+( java.io.FileOutputStream;) p n
+(import) K
+( java.rmi.registry.LocateRegistry;) p n
+(import) K
+( java.rmi.registry.Registry;) p n
+(import) K
+( java.util.Properties;) p n
+() N
+(public) K
+( ) p
+(class) K
+( ) p
+(Client) L
+( {) p n
+(  ) S
+(static) K
+( Registry r;) p n
+(  ) S
+(static) K
+( TrackerHandler trackerHandler;) p n
+(  ) S
+(static) K
+( CallbackEvent cbe;) p n
+(  ) S
+(static) K
+( Properties p;) p n
+() N
+(  ) S
+(public) K
+( ) p
+(static) K
+( ) p
+(void) k
+( main\(String[] args\) {) p n
+(    p = ) S
+(new) K
+( Properties\(\);) p n
+(    File file = ) S
+(new) K
+( File\(") p
+(client.config.properties) str
+("\);) p n
+(    ) S
+(if) K
+( \(!file.exists\(\)\) {) p n
+(      ) S
+(try) K
+( {) p n
+(        System.out.println\(") S
+(Cant find properties file. Writing default.) str
+("\);) p n
+(        ) S
+(// Load default config) c n
+(        FileOutputStream out = ) p
+(new) K
+( FileOutputStream\(") p
+(client.config.properties) str
+("\);) p n
+(        p.put\(") S
+(trackers) str
+(", ") p
+(localhost:1099) str
+("\);) p n
+(        p.put\(") S
+(rmi_registry_host) str
+(", ") p
+(localhost) str
+("\);) p n
+(        p.put\(") S
+(rmi_registry_port) str
+(", ") p
+(1088) str
+("\);) p n
+(        p.store\(out, ) S
+(null) k
+(\);) p n
+(      } ) S
+(catch) K
+( \(Exception e\) {) p n
+(        System.err.println\(") S
+(Unable to save file client.config.properties) str
+("\);) p n
+(        e.printStackTrace\(\);) N
+(        ) S
+(return) K
+(;) p n
+(      }) N
+(    } ) S
+(else) K
+( {) p n
+(      ) S
+(try) K
+( {) p n
+(        ) S
+(// Load config) c n
+(        FileInputStream in = ) p
+(new) K
+( FileInputStream\(") p
+(client.config.properties) str
+("\);) p n
+(        p.load\(in\);) N
+(      } ) S
+(catch) K
+( \(Exception e\) {) p n
+(        System.err.println\(") S
+(Unable to open file client.config.properties) str
+("\);) p n
+(        e.printStackTrace\(\);) N
+(        ) S
+(return) K
+(;) p n
+(      }) N
+(    }) N
+(    ) S
+(try) K
+( {) p n
+(      ) S
+(// Parse RMI Registry port) c n
+(      ) p
+(int) k
+( port = Integer.parseInt\(p.get\(") p
+(rmi_registry_port) str
+("\).toString\(\)\);) p n
+(      ) S
+(// Create a local registry for callback so user does not need to) c n
+(      r = LocateRegistry.createRegistry\(port\);) p n
+(    } ) S
+(catch) K
+( \(Exception e\) {) p n
+(      e.printStackTrace\(\);) N
+(      ) S
+(return) K
+(;) p n
+(    }) N
+(    ) S
+(// Setup callback) c n
+(    cbe = ) p
+(new) K
+( CallbackEvent\(\);) p n
+(    ) S
+(new) K
+( CallbackServer\(p, cbe\).start\(\);) p n
+(    ) S
+(// Setup tracker connection) c n
+(    trackerHandler = ) p
+(new) K
+( TrackerHandler\(p\);) p n
+(    ) S
+(if) K
+( \(!trackerHandler.Init\(\)\) {) p n
+(      System.exit\(1\);) N
+(    }) N
+(    ) S
+(// Run job) c n
+(    ) p
+(new) K
+( ClientJobVideoAnalytics\(trackerHandler, cbe\).run\(\);) p n
+(  }) N
+(}) N
+(Client.java) (Page 1/1) (Dec 05, 18 19:10) title
+border
+grestore
+(Printed by ) rhead
+(src/client/Client.java) (9/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1-2) 10
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(import) K
+( java.awt.Desktop;) p n
+(import) K
+( java.io.File;) p n
+(import) K
+( java.io.FileOutputStream;) p n
+(import) K
+( java.nio.file.Files;) p n
+(import) K
+( java.rmi.Naming;) p n
+(import) K
+( java.rmi.registry.LocateRegistry;) p n
+(import) K
+( java.rmi.registry.Registry;) p n
+(import) K
+( java.text.MessageFormat;) p n
+(import) K
+( java.util.Arrays;) p n
+(import) K
+( java.util.concurrent.TimeUnit;) p n
+() N
+(public) K
+( ) p
+(class) K
+( ) p
+(ClientJobVideoAnalytics) L
+( {) p n
+(  TrackerHandler trackerHandler;) N
+(  CallbackEvent cbe;) N
+(  ) S
+(long) k
+( startTime;) p n
+() N
+(  ) S
+(public) K
+( ClientJobVideoAnalytics\(TrackerHandler trackerHandler, CallbackEvent cb) p n
+(e\) {) N
+(    this.trackerHandler = trackerHandler;) N
+(    this.cbe = cbe;) N
+(  }) N
+() N
+(  ) S
+(public) K
+( ) p
+(void) k
+( run\(\) {) p n
+(    ) S
+(// Register callback event) c n
+(    cbe.addListener\(\(x\) -> {) p n
+(      callBackFromVideoAnalytics\(x\);) N
+(    }\);) N
+(    ) S
+(// Record down start time) c n
+(    startTime = System.currentTimeMillis\(\);) p n
+(    ) S
+(// Query for VideoAnalytics Service from tracker) c n
+(    IServiceNode[] sn = trackerHandler.Query\(") p
+(VideoAnalytics) str
+("\);) p n
+(    ) S
+(if) K
+( \(sn == ) p
+(null) k
+(\) {) p n
+(      ) S
+(// If cant find any) c n
+(      System.err.println\(") p
+(Cant find any service with name {VideoAnalytics} quit.) str
+("\);) p n
+(      System.exit\(1\);) N
+(    }) N
+(    IServiceInterface service = ) S
+(null) k
+(;) p n
+(    ) S
+(for) K
+( \(IServiceNode s : sn\) {) p n
+(      ) S
+(try) K
+( {) p n
+(        ) S
+(// try and connect to server registry) c n
+(        Registry cr = LocateRegistry.getRegistry\(s.getIp\(\), s.getPort\(\)\);) p n
+(        service = \(IServiceInterface\) cr.lookup\(") S
+(Service) str
+("\);) p n
+(        ) S
+(// Found 1 means no exception, enough break out.) c n
+(        ) p
+(break) K
+(;) p n
+(      } ) S
+(catch) K
+( \(Exception e\) {) p n
+(        ) S
+(// Cant connect to that continue look for antoher server) c n
+(        e.printStackTrace\(\);) p n
+(        System.out.println\(MessageFormat.format\(") S
+(Cant get service with ip {0}. Next.) str
+(", s.ge) p n
+(tIp\(\)\)\);) N
+(      }) N
+(    }) N
+(    ) S
+(// No server found) c n
+(    ) p
+(if) K
+( \(service == ) p
+(null) k
+(\) {) p n
+(      System.err.println\(") S
+(No service found! Quit.) str
+("\);) p n
+(      System.exit\(1\);) N
+(    }) N
+(    ) S
+(try) K
+( {) p n
+(      ) S
+(// Open Video.mp4 file) c n
+(      File f = ) p
+(new) K
+( File\(") p
+(Video.mp4) str
+("\);) p n
+(      ) S
+(// Read as bytes) c n
+(      ) p
+(byte) k
+([] fileContent = Files.readAllBytes\(f.toPath\(\)\);) p n
+(      ) S
+(// Call VideoAnalytics Service via the found server. This function is) c n
+(ClientJobVideoAnalytics.java) (Page 1/2) (Dec 05, 18 19:07) title
+border
+/v 1 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(      ) p
+(// asynchronous.) c n
+(      service.RunServiceAsync\(") p
+(VideoAnalytics) str
+(", ) p
+(new) K
+( ) p
+(byte) k
+([][] { fileContent }, ) p
+(new) K
+( S) p n
+(tring[] { ") S
+(Video.mp4) str
+(" },) p n
+(          Client.p.getProperty\(") S
+(rmi_registry_port) str
+("\)\);) p n
+(    } ) S
+(catch) K
+( \(Exception e\) {) p n
+(      ) S
+(// Server cant do it) c n
+(      System.err.println\(") p
+(Unable to submit job. Quit.) str
+("\);) p n
+(      e.printStackTrace\(\);) N
+(      System.exit\(1\);) N
+(    }) N
+(    ) S
+(// Server cant do it) c n
+(    System.out.println\(") p
+(Job submitted. Waiting for callback.) str
+("\);) p n
+(  }) N
+() N
+(  ) S
+(public) K
+( ) p
+(void) k
+( callBackFromVideoAnalytics\(EventArgs args\) {) p n
+(    ) S
+(// A callback from the server with serviceName as VideoAnalytics) c n
+(    ) p
+(if) K
+( \(args.serviceName.equals\(") p
+(VideoAnalytics) str
+("\)\) {) p n
+(      ) S
+(// If it is an exception, print it) c n
+(      ) p
+(if) K
+( \(args.exception != ) p
+(null) k
+(\) {) p n
+(        System.err.println\(") S
+(Error Callback from VideoAnalytics Service from ) str
+(" + args.ipAddress) p n
+(\);) N
+(        args.exception.printStackTrace\(\);) N
+(        System.exit\(1\);) N
+(      }) N
+(      ) S
+(// Else is result) c n
+(      System.out.println\(") p
+(Callback from VideoAnalytics service from ) str
+(" + args.ipAddress\);) p n
+(      ) S
+(try) K
+( {) p n
+(        ) S
+(// Save the return byte[] as image file.) c n
+(        File imgFile = ) p
+(new) K
+( File\(") p
+(graph.png) str
+("\);) p n
+(        ) S
+(try) K
+( \(FileOutputStream fos = ) p
+(new) K
+( FileOutputStream\(imgFile\)\) {) p n
+(          fos.write\(args.byteData[0]\);) N
+(        }) N
+(        ) S
+(// Open the image file.) c n
+(        Desktop.getDesktop\(\).open\(imgFile\);) p n
+(        ) S
+(// Print how long it takes) c n
+(        ) p
+(long) k
+( stopTime = System.currentTimeMillis\(\);) p n
+(        ) S
+(long) k
+( elapsedTime = stopTime - startTime;) p n
+(        System.out.println\(") S
+(It took: ) str
+(" + elapsedTime + ") p
+(ms) str
+("\);) p n
+(        ) S
+(long) k
+( minutes = TimeUnit.MILLISECONDS.toMinutes\(elapsedTime\);) p n
+(        System.out.println\(") S
+(AKA: ) str
+(" + minutes + ") p
+( minutes.) str
+("\);) p n
+(        System.exit\(0\);) N
+(      } ) S
+(catch) K
+( \(Exception e\) {) p n
+(        e.printStackTrace\(\);) N
+(        System.exit\(1\);) N
+(      }) N
+(    }) N
+(  }) N
+(}) S
+(ClientJobVideoAnalytics.java) (Page 2/2) (Dec 05, 18 19:07) title
+border
+grestore
+(Printed by ) rhead
+(src/client/ClientJobVideoAnalytics.java) (10/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 11
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(import) K
+( java.rmi.RemoteException;) p n
+() N
+(public) K
+( ) p
+(interface) K
+( ) p
+(ICallback) L
+( ) p
+(extends) K
+( java.rmi.Remote {) p n
+(  ) S
+(public) K
+( ) p
+(void) k
+( NewCallback\(String serviceName, String[] data\) ) p
+(throws) K
+( RemoteExcept) p n
+(ion;) N
+(  ) S
+(public) K
+( ) p
+(void) k
+( NewCallback\(String serviceName, ) p
+(byte) k
+([][] data\) ) p
+(throws) K
+( RemoteExcept) p n
+(ion;) N
+(  ) S
+(public) K
+( ) p
+(void) k
+( NewExceptionCallback\(String serviceName, Exception exception\) ) p
+(thro) K n
+(ws) S
+( RemoteException;) p n
+(}) S
+(ICallback.java) (Page 1/1) (Dec 04, 18 17:25) title
+border
+grestore
+(Printed by ) rhead
+(src/client/ICallback.java) (11/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 12
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(import) K
+( java.rmi.RemoteException;) p n
+() N
+(public) K
+( ) p
+(interface) K
+( ) p
+(IServiceInterface) L
+( ) p
+(extends) K
+( java.rmi.Remote {) p n
+(  ) S
+(public) K
+( String[] RunService\(String service, String[] data\) ) p
+(throws) K
+( RemoteExcepti) p n
+(on;) N
+(  ) S
+(public) K
+( ) p
+(boolean) k
+( RunServiceAsync\(String service, String[] data, String callbackP) p n
+(ort\) ) S
+(throws) K
+( RemoteException;) p n
+(  ) S
+(public) K
+( ) p
+(byte) k
+([][] RunService\(String service, ) p
+(byte) k
+([][] data, String[] data2\) ) p
+(thro) K n
+(ws) S
+( RemoteException;) p n
+(  ) S
+(public) K
+( ) p
+(boolean) k
+( RunServiceAsync\(String service, ) p
+(byte) k
+([][] data, String[] data2, ) p n
+(String callbackPort\) ) S
+(throws) K
+( RemoteException;) p n
+(}) S
+(IServiceInterface.java) (Page 1/1) (Dec 04, 18 16:35) title
+border
+grestore
+(Printed by ) rhead
+(src/client/IServiceInterface.java) (12/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 13
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(import) K
+( java.io.Serializable;) p n
+() N
+(public) K
+( ) p
+(interface) K
+( ) p
+(IServiceNode) L
+( ) p
+(extends) K
+( Serializable {) p n
+(  String getIp\(\);) N
+() N
+(  ) S
+(int) k
+( getPort\(\);) p n
+() N
+(  String[] getService\(\);) N
+(}) S
+(IServiceNode.java) (Page 1/1) (Nov 30, 18 14:13) title
+border
+grestore
+(Printed by ) rhead
+(src/client/IServiceNode.java) (13/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 14
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(public) K
+( ) p
+(class) K
+( ) p
+(ServiceNode) L
+( ) p
+(implements) K
+( IServiceNode {) p n
+(  ) S
+(public) K
+( String Ip;) p n
+(  ) S
+(public) K
+( ) p
+(int) k
+( Port; ) p n
+(  ) S
+(public) K
+( String[] Services;) p n
+() N
+(  ) S
+(public) K
+( String getIp\(\){) p n
+(    ) S
+(return) K
+( Ip;) p n
+(  }) N
+(  ) S
+(public) K
+( ) p
+(int) k
+( getPort\(\){) p n
+(    ) S
+(return) K
+( Port;) p n
+(  }) N
+(  ) S
+(public) K
+( String[] getService\(\){) p n
+(    ) S
+(return) K
+( Services;) p n
+(  }) N
+() N
+(  @Override) N
+(  ) S
+(public) K
+( ) p
+(int) k
+( hashCode\(\) {) p n
+(    ) S
+(int) k
+( hc = 0;) p n
+(    ) S
+(for) K
+( \(String s : Services\) {) p n
+(      hc += s.hashCode\(\);) N
+(    }) N
+(    ) S
+(return) K
+( Ip.hashCode\(\) + hc;) p n
+(  }) N
+(}) S
+(ServiceNode.java) (Page 1/1) (Dec 04, 18 12:42) title
+border
+grestore
+(Printed by ) rhead
+(src/client/ServiceNode.java) (14/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 15
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(import) K
+( java.net.MalformedURLException;) p n
+(import) K
+( java.rmi.Naming;) p n
+(import) K
+( java.rmi.NotBoundException;) p n
+(import) K
+( java.rmi.RemoteException;) p n
+(import) K
+( java.text.MessageFormat;) p n
+(import) K
+( java.util.ArrayList;) p n
+(import) K
+( java.util.Properties;) p n
+() N
+(public) K
+( ) p
+(class) K
+( ) p
+(TrackerHandler) L
+( {) p n
+(  Properties p;) N
+(  ArrayList<TrackerInterface> trackers;) N
+() N
+(  ) S
+(public) K
+( TrackerHandler\(Properties p\) {) p n
+(    this.p = p;) N
+(  }) N
+() N
+(  ) S
+(public) K
+( Boolean Init\(\) {) p n
+(    ) S
+(// Get all trackers from properties) c n
+(    String[] trackerHosts = p.get\(") p
+(trackers) str
+("\).toString\(\).split\(") p
+(,) str
+("\);) p n
+(    trackers = ) S
+(new) K
+( ArrayList<>\(\);) p n
+(    ) S
+(// Loop through all tracker and find all tracker that is available) c n
+(    ) p
+(for) K
+( \() p
+(int) k
+( i = 0; i < trackerHosts.length; i++\) {) p n
+(      String tracker = trackerHosts[i];) N
+(      ) S
+(try) K
+( {) p n
+(        TrackerInterface ti = \(TrackerInterface\) Naming) N
+(            .lookup\(MessageFormat.format\(") S
+(rmi://{0}/TrackerService) str
+(", tracker\)\);) p n
+(        System.out.println\(MessageFormat.format\(") S
+(Connected to tracker: {0}) str
+(", tracker\)\);) p n
+(        trackers.add\(ti\);) N
+(      } ) S
+(catch) K
+( \(NotBoundException | RemoteException e\) {) p n
+(        e.printStackTrace\(\);) N
+(        System.err.println\(MessageFormat.format\(") S
+(Unable to connect to tracker with host: {0}.) str
+(") p n
+(, tracker\)\);) N
+(      } ) S
+(catch) K
+( \(MalformedURLException e\) {) p n
+(        e.printStackTrace\(\);) N
+(        System.err.println\(MessageFormat.format\(") S
+(The tracker host configured is not valid: {0}.) str
+() p n
+(", tracker\)\);) N
+(      }) N
+(    }) N
+(    ) S
+(if) K
+( \(trackers.size\(\) == 0\) {) p n
+(      System.err.println\(") S
+(No tracker is connected. Unable to continue.) str
+("\);) p n
+(      ) S
+(return) K
+( ) p
+(false) k
+(;) p n
+(    }) N
+(    ) S
+(return) K
+( ) p
+(true) k
+(;) p n
+(  }) N
+() N
+(  ) S
+(public) K
+( IServiceNode[] Query\(String service\) {) p n
+(    ) S
+(// Loop through all tracker and find one that can return the wanted service) c n
+(    ) p
+(for) K
+( \(TrackerInterface tracker : trackers\) {) p n
+(      ) S
+(try) K
+( {) p n
+(        IServiceNode[] serviceNodes = \(IServiceNode[]\)tracker.GetMeService\(servi) N
+(ce\);) N
+(        ) S
+(if) K
+( \(serviceNodes.length != 0\) {) p n
+(          ) S
+(return) K
+( serviceNodes;) p n
+(        }) N
+(      } ) S
+(catch) K
+( \(Exception e\) {) p n
+(        e.printStackTrace\(\);) N
+(      }) N
+(    }) N
+(    ) S
+(return) K
+( ) p
+(null) k
+(;) p n
+(  }) N
+(}) S
+(TrackerHandler.java) (Page 1/1) (Dec 05, 18 19:09) title
+border
+grestore
+(Printed by ) rhead
+(src/client/TrackerHandler.java) (15/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 16
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(import) K
+( java.rmi.RemoteException;) p n
+(import) K
+( java.rmi.server.ServerNotActiveException;) p n
+() N
+(public) K
+( ) p
+(interface) K
+( ) p
+(TrackerInterface) L
+( ) p
+(extends) K
+( java.rmi.Remote {) p n
+(  ) S
+(public) K
+( Boolean RegisterMeAsService\(String[] services, ) p
+(int) k
+( port, String ipAddr\)) p n
+( ) S
+(throws) K
+( RemoteException;) p n
+() N
+(  ) S
+(public) K
+( IServiceNode[] GetMeService\(String service\) ) p
+(throws) K
+( RemoteException;) p n
+(  ) N
+(  ) S
+(public) K
+( IServiceNode[] GetMeServices\(String[] services\) ) p
+(throws) K
+( RemoteException;) p n
+() N
+(  ) S
+(public) K
+( Boolean RemoveMe\(String ipAddr\) ) p
+(throws) K
+( RemoteException, ServerNotActive) p n
+(Exception;) N
+(}) S
+(TrackerInterface.java) (Page 1/1) (Dec 04, 18 19:30) title
+border
+grestore
+(Printed by ) rhead
+(src/client/TrackerInterface.java) (16/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 17
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(mkdir bin) p n
+(javac -d bin *.java) N
+(if %errorlevel% neq 0 exit /b %errorlevel%) N
+(copy manifest.txt bin) N
+(cd bin) N
+(jar cvfm client.jar manifest.txt *.class) N
+(cd ../) S
+(build.bat) (Page 1/1) (Nov 30, 18 13:39) title
+border
+grestore
+(Printed by ) rhead
+(src/client/build.bat) (17/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 18
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(mkdir -p bin) p n
+(javac -d bin *.java) N
+(cp manifest.txt bin) N
+(cd bin) N
+(jar cvfm client.jar manifest.txt *.class) N
+(cd ../) S
+(build.sh) (Page 1/1) (Dec 05, 18 18:21) title
+border
+grestore
+(Printed by ) rhead
+(src/client/build.sh) (18/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 19
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(Manifest-Version: 1.0) p n
+(Main-Class: Client) N
+(manifest.txt) (Page 1/1) (Nov 22, 18 10:21) title
+border
+grestore
+(Printed by ) rhead
+(src/client/manifest.txt) (19/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 20
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(import) K
+( java.io.Serializable;) p n
+() N
+(public) K
+( ) p
+(interface) K
+( ) p
+(IServiceNode) L
+( ) p
+(extends) K
+( Serializable {) p n
+(  String getIp\(\);) N
+() N
+(  ) S
+(int) k
+( getPort\(\);) p n
+() N
+(  String[] getService\(\);) N
+(}) S
+(IServiceNode.java) (Page 1/1) (Nov 30, 18 14:12) title
+border
+grestore
+(Printed by ) rhead
+(src/tracker/IServiceNode.java) (20/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 21
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(public) K
+( ) p
+(class) K
+( ) p
+(ServiceNode) L
+( ) p
+(implements) K
+( IServiceNode {) p n
+(  ) S
+(public) K
+( String Ip;) p n
+(  ) S
+(public) K
+( ) p
+(int) k
+( Port; ) p n
+(  ) S
+(public) K
+( String[] Services;) p n
+() N
+(  ) S
+(public) K
+( String getIp\(\){) p n
+(    ) S
+(return) K
+( Ip;) p n
+(  }) N
+(  ) S
+(public) K
+( ) p
+(int) k
+( getPort\(\){) p n
+(    ) S
+(return) K
+( Port;) p n
+(  }) N
+(  ) S
+(public) K
+( String[] getService\(\){) p n
+(    ) S
+(return) K
+( Services;) p n
+(  }) N
+() N
+(  @Override) N
+(  ) S
+(public) K
+( ) p
+(int) k
+( hashCode\(\) {) p n
+(    ) S
+(int) k
+( hc = 0;) p n
+(    ) S
+(for) K
+( \(String s : Services\) {) p n
+(      hc += s.hashCode\(\);) N
+(    }) N
+(    ) S
+(return) K
+( Ip.hashCode\(\) + hc;) p n
+(  }) N
+(}) S
+(ServiceNode.java) (Page 1/1) (Nov 30, 18 14:12) title
+border
+grestore
+(Printed by ) rhead
+(src/tracker/ServiceNode.java) (21/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 22
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(import) K
+( java.io.File;) p n
+(import) K
+( java.io.FileInputStream;) p n
+(import) K
+( java.io.FileOutputStream;) p n
+(import) K
+( java.rmi.registry.LocateRegistry;) p n
+(import) K
+( java.rmi.registry.Registry;) p n
+(import) K
+( java.util.Properties;) p n
+() N
+(public) K
+( ) p
+(class) K
+( ) p
+(Tracker) L
+( {) p n
+(  ) S
+(static) K
+( Registry r;) p n
+(  ) S
+(public) K
+( ) p
+(static) K
+( ) p
+(void) k
+( main\(String[] args\) {) p n
+(    Properties p = ) S
+(new) K
+( Properties\(\);) p n
+(    ) S
+(// Load the config) c n
+(    File file = ) p
+(new) K
+( File\(") p
+(tracker.config.properties) str
+("\);) p n
+(    ) S
+(if) K
+( \(!file.exists\(\)\) {) p n
+(      ) S
+(try) K
+( {) p n
+(        System.out.println\(") S
+(Cant find properties file. Writing default.) str
+("\);) p n
+(        FileOutputStream out = ) S
+(new) K
+( FileOutputStream\(") p
+(tracker.config.properties) str
+("\);) p n
+(        p.put\(") S
+(rmi_registry_port) str
+(", ") p
+(1099) str
+("\);) p n
+(        p.store\(out, ) S
+(null) k
+(\);) p n
+(      } ) S
+(catch) K
+( \(Exception e\) {) p n
+(        System.err.println\(") S
+(Unable to save file tracker.config.properties) str
+("\);) p n
+(        e.printStackTrace\(\);) N
+(        ) S
+(return) K
+(;) p n
+(      }) N
+(    } ) S
+(else) K
+( {) p n
+(      ) S
+(try) K
+( {) p n
+(        ) S
+(// If cant load config) c n
+(        FileInputStream in = ) p
+(new) K
+( FileInputStream\(") p
+(tracker.config.properties) str
+("\);) p n
+(        p.load\(in\);) N
+(      } ) S
+(catch) K
+( \(Exception e\) {) p n
+(        System.err.println\(") S
+(Unable to open file tracker.config.properties) str
+("\);) p n
+(        e.printStackTrace\(\);) N
+(        ) S
+(return) K
+(;) p n
+(      }) N
+(    }) N
+(    ) S
+(try) K
+( {) p n
+(      ) S
+(// Parse RMI Registry port) c n
+(      ) p
+(int) k
+( port = Integer.parseInt\(p.get\(") p
+(rmi_registry_port) str
+("\).toString\(\)\);) p n
+(      ) S
+(// Create a local registry so user does not need to) c n
+(      r = LocateRegistry.createRegistry\(port\);) p n
+(    } ) S
+(catch) K
+( \(Exception e\) {) p n
+(      e.printStackTrace\(\);) N
+(      ) S
+(return) K
+(;) p n
+(    }) N
+(    ) S
+(// Start tracker server) c n
+(    ) p
+(new) K
+( TrackerServer\(p\).start\(\);) p n
+(  }) N
+(}) N
+(Tracker.java) (Page 1/1) (Dec 05, 18 19:11) title
+border
+grestore
+(Printed by ) rhead
+(src/tracker/Tracker.java) (22/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1-2) 23
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(import) K
+( java.rmi.RemoteException;) p n
+(import) K
+( java.text.MessageFormat;) p n
+(import) K
+( java.util.ArrayList;) p n
+(import) K
+( java.util.Arrays;) p n
+(import) K
+( java.util.HashMap;) p n
+(import) K
+( java.util.LinkedHashSet;) p n
+(import) K
+( java.util.Map;) p n
+(import) K
+( java.util.Set;) p n
+(import) K
+( java.rmi.server.ServerNotActiveException;) p n
+() N
+(class) K
+( ) p
+(TrackerImpl) L
+( ) p
+(extends) K
+( java.rmi.server.UnicastRemoteObject ) p
+(implements) K
+( TrackerI) p n
+(nterface {) N
+(  ) S
+(private) K
+( Map<String, ArrayList<IServiceNode>> serviceDict;) p n
+(  ) S
+(private) K
+( ArrayList<IServiceNode> serviceNodes;) p n
+() N
+(  TrackerImpl\(\) ) S
+(throws) K
+( RemoteException {) p n
+(    ) S
+(super) K
+(\(\);) p n
+(    serviceDict = ) S
+(new) K
+( HashMap<String, ArrayList<IServiceNode>>\(\);) p n
+(    serviceNodes = ) S
+(new) K
+( ArrayList<>\(\);) p n
+(  }) N
+() N
+(  ) S
+(private) K
+( ) p
+(void) k
+( Log\(String log\) {) p n
+(    System.out.println\(log\);) N
+(  }) N
+(  ) S
+(// Register a server as a service) c n
+(  ) p
+(public) K
+( Boolean RegisterMeAsService\(String[] services, ) p
+(int) k
+( port, String ipAddr\)) p n
+( ) S
+(throws) K
+( RemoteException {) p n
+(    Log\(MessageFormat.format\(") S
+(Request: {0}) str
+(", ipAddr\)\);) p n
+(    ) S
+(// Loop trough all service current service node. If the ip already registere) c n
+(d.) N
+(    ) p
+(for) K
+( \(IServiceNode sn : serviceNodes\) {) p n
+(      ) S
+(if) K
+( \(sn.getIp\(\).equals\(ipAddr\)\) {) p n
+(        Log\(MessageFormat.format\(") S
+(IP: {0} already added.) str
+(", ipAddr\)\);) p n
+(        ) S
+(return) K
+( ) p
+(false) k
+(;) p n
+(      }) N
+(    }) N
+(    ) S
+(// Create a new service node) c n
+(    ServiceNode serviceNode = ) p
+(new) K
+( ServiceNode\(\);) p n
+(    serviceNode.Ip = ipAddr;) N
+(    serviceNode.Services = services;) N
+(    serviceNode.Port = port;) N
+(    ) S
+(// Make Map) c n
+(    ) p
+(for) K
+( \(String s : services\) {) p n
+(      ArrayList<IServiceNode> sn = serviceDict.get\(s\);) N
+(      ) S
+(if) K
+( \(sn == ) p
+(null) k
+(\) {) p n
+(        sn = ) S
+(new) K
+( ArrayList<IServiceNode>\(\);) p n
+(        serviceDict.put\(s, sn\);) N
+(      }) N
+(      sn.add\(serviceNode\);) N
+(    }) N
+(    Log\(MessageFormat.format\(") S
+(IP: {0}:{1} added with services {2}) str
+(", ipAddr, port, Arrays.t) p n
+(oString\(services\)\)\);) N
+(    serviceNodes.add\(serviceNode\);) N
+(    ) S
+(return) K
+( ) p
+(true) k
+(;) p n
+(  }) N
+(  ) S
+(// Return all serviceNodes that matches the service requested) c n
+(  ) p
+(public) K
+( IServiceNode[] GetMeService\(String service\) ) p
+(throws) K
+( RemoteException{) p n
+(    ArrayList<IServiceNode> sn = serviceDict.get\(service\);) N
+(    ) S
+(if) K
+(\(sn == ) p
+(null) k
+(\) ) p
+(return) K
+( ) p
+(new) K
+( IServiceNode[0];) p n
+(    ) S
+(return) K
+( sn.toArray\() p
+(new) K
+( IServiceNode[sn.size\(\)]\);) p n
+(  }) N
+() N
+(TrackerImpl.java) (Page 1/2) (Dec 05, 18 19:13) title
+border
+/v 1 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(  ) p
+(// Return all serviceNodes that matches the service requested) c n
+(  ) p
+(public) K
+( IServiceNode[] GetMeServices\(String[] services\) ) p
+(throws) K
+( RemoteException ) p n
+({) N
+(    ArrayList<IServiceNode> sns = ) S
+(new) K
+( ArrayList<>\(\);) p n
+(    ) S
+(for) K
+( \(String s : services\) {) p n
+(      ArrayList<IServiceNode> sn = serviceDict.get\(s\);) N
+(      ) S
+(if) K
+( \(sn != ) p
+(null) k
+(\) {) p n
+(        sns.addAll\(sn\);) N
+(      }) N
+(    }) N
+(    ) S
+(return) K
+( MergeServiceNodes\(sns\);) p n
+(  }) N
+() N
+(  ) S
+(// Delist the serviceNode that matches the ipAddress) c n
+(  ) p
+(public) K
+( Boolean RemoveMe\(String ipAddr\) ) p
+(throws) K
+( RemoteException, ServerNotActive) p n
+(Exception {) N
+(    IServiceNode removeNode = ) S
+(null) k
+(;) p n
+(    ) S
+(for) K
+( \(IServiceNode sn : serviceNodes\) {) p n
+(      ) S
+(if) K
+( \(sn.getIp\(\).equals\(ipAddr\)\) {) p n
+(        removeNode = sn;) N
+(        ) S
+(break) K
+(;) p n
+(      }) N
+(    }) N
+(    ) S
+(if) K
+(\(removeNode == ) p
+(null) k
+(\){) p n
+(      ) S
+(return) K
+( ) p
+(false) k
+(;) p n
+(    }) N
+(    Log\(MessageFormat.format\(") S
+(IP: {0} removed) str
+(", ipAddr\)\);) p n
+(    ) S
+(for) K
+( \(String service : removeNode.getService\(\)\) {) p n
+(      serviceDict.get\(service\).remove\(removeNode\);) N
+(    }) N
+(    serviceNodes.remove\(removeNode\);) N
+(    ) S
+(return) K
+( ) p
+(true) k
+(;) p n
+(  }) N
+() N
+(  ) S
+(private) K
+( IServiceNode[] MergeServiceNodes\(ArrayList<IServiceNode> services\) {) p n
+(    Set<IServiceNode> set = ) S
+(new) K
+( LinkedHashSet<>\(\);) p n
+(    set.addAll\(services\);) N
+(    services.clear\(\);) N
+(    services.addAll\(set\);) N
+(    ) S
+(return) K
+( services.toArray\() p
+(new) K
+( IServiceNode[services.size\(\)]\);) p n
+(  }) N
+(}) S
+(TrackerImpl.java) (Page 2/2) (Dec 05, 18 19:13) title
+border
+grestore
+(Printed by ) rhead
+(src/tracker/TrackerImpl.java) (23/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 24
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(import) K
+( java.rmi.RemoteException;) p n
+(import) K
+( java.rmi.server.ServerNotActiveException;) p n
+() N
+(public) K
+( ) p
+(interface) K
+( ) p
+(TrackerInterface) L
+( ) p
+(extends) K
+( java.rmi.Remote {) p n
+(  ) S
+(public) K
+( Boolean RegisterMeAsService\(String[] services, ) p
+(int) k
+( port, String ipAddr\)) p n
+( ) S
+(throws) K
+( RemoteException;) p n
+() N
+(  ) S
+(public) K
+( IServiceNode[] GetMeService\(String service\) ) p
+(throws) K
+( RemoteException;) p n
+(  ) N
+(  ) S
+(public) K
+( IServiceNode[] GetMeServices\(String[] services\) ) p
+(throws) K
+( RemoteException;) p n
+() N
+(  ) S
+(public) K
+( Boolean RemoveMe\(String ipAddr\) ) p
+(throws) K
+( RemoteException, ServerNotActive) p n
+(Exception;) N
+(}) S
+(TrackerInterface.java) (Page 1/1) (Dec 04, 18 19:30) title
+border
+grestore
+(Printed by ) rhead
+(src/tracker/TrackerInterface.java) (24/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 25
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(import) K
+( java.rmi.Naming;) p n
+(import) K
+( java.rmi.server.UnicastRemoteObject;) p n
+(import) K
+( java.text.MessageFormat;) p n
+(import) K
+( java.util.Properties;) p n
+() N
+(public) K
+( ) p
+(class) K
+( ) p
+(TrackerServer) L
+( {) p n
+(  TrackerImpl t;) N
+(  Properties p;) N
+(  ) S
+(public) K
+( TrackerServer\(Properties p\){) p n
+(    this.p = p;) N
+(  }) N
+(  ) S
+(public) K
+( ) p
+(void) k
+( start\(\) {) p n
+(    ) S
+(try) K
+( {) p n
+(      ) S
+(// Register tracker instance) c n
+(      t = ) p
+(new) K
+( TrackerImpl\(\);) p n
+(      System.out.println\(") S
+(Server Ready) str
+("\);) p n
+(      Naming.rebind\(MessageFormat.format\(") S
+(rmi://localhost:{0}/TrackerService) str
+(", p.get\(") p
+(rmi_re) str n
+(gistry_port) S
+("\)\), t\);) p n
+(    } ) S
+(catch) K
+( \(Exception e\) {) p n
+(      e.printStackTrace\(\);) N
+(    }) N
+(  }) N
+(}) S
+(TrackerServer.java) (Page 1/1) (Dec 05, 18 19:11) title
+border
+grestore
+(Printed by ) rhead
+(src/tracker/TrackerServer.java) (25/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 26
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(mkdir bin) p n
+(javac -d bin *.java) N
+(if %errorlevel% neq 0 exit /b %errorlevel%) N
+(copy manifest.txt bin) N
+(cd bin) N
+(jar cvfm tracker.jar manifest.txt *.class) N
+(cd ../) S
+(build.bat) (Page 1/1) (Nov 30, 18 13:38) title
+border
+grestore
+(Printed by ) rhead
+(src/tracker/build.bat) (26/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 27
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(mkdir -p bin) p n
+(javac -d bin *.java) N
+(cp manifest.txt bin) N
+(cd bin) N
+(jar cvfm tracker.jar manifest.txt *.class) N
+(cd ../) S
+(build.sh) (Page 1/1) (Dec 05, 18 18:21) title
+border
+grestore
+(Printed by ) rhead
+(src/tracker/build.sh) (27/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 28
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(Manifest-Version: 1.0) p n
+(Main-Class: Tracker) N
+(manifest.txt) (Page 1/1) (Nov 21, 18 11:45) title
+border
+grestore
+(Printed by ) rhead
+(src/tracker/manifest.txt) (28/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 29
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(import) K
+( java.rmi.RemoteException;) p n
+() N
+(public) K
+( ) p
+(class) K
+( ) p
+(CallBackHandler{) L n
+(  ) p
+(private) K
+( ICallback callback;) p n
+(  CallBackHandler\(ICallback callback\){) N
+(    this.callback = callback;) N
+(  }) N
+(  ) S
+(public) K
+( ) p
+(boolean) k
+( ExecuteCallback\(String serviceName, String[] data\){) p n
+(    ) S
+(try) K
+( {) p n
+(      callback.NewCallback\(serviceName, data\);) N
+(    } ) S
+(catch) K
+( \(RemoteException e\) {) p n
+(      e.printStackTrace\(\);) N
+(      ) S
+(return) K
+( ) p
+(false) k
+(;) p n
+(    }) N
+(    ) S
+(return) K
+( ) p
+(true) k
+(;) p n
+(  }) N
+(  ) S
+(public) K
+( ) p
+(boolean) k
+( ExecuteCallback\(String serviceName, ) p
+(byte) k
+([][] data\){) p n
+(    ) S
+(try) K
+( {) p n
+(      callback.NewCallback\(serviceName, data\);) N
+(    } ) S
+(catch) K
+( \(RemoteException e\) {) p n
+(      e.printStackTrace\(\);) N
+(      ) S
+(return) K
+( ) p
+(false) k
+(;) p n
+(    }) N
+(    ) S
+(return) K
+( ) p
+(true) k
+(;) p n
+(  }) N
+(  ) S
+(public) K
+( ) p
+(boolean) k
+( ExecuteExceptionCallback\(String serviceName, Exception e\){) p n
+(    ) S
+(try) K
+( {) p n
+(      callback.NewExceptionCallback\(serviceName, e\);) N
+(    } ) S
+(catch) K
+( \(RemoteException ex\) {) p n
+(      ex.printStackTrace\(\);) N
+(      ) S
+(return) K
+( ) p
+(false) k
+(;) p n
+(    }) N
+(    ) S
+(return) K
+( ) p
+(true) k
+(;) p n
+(  }) N
+(}) S
+(CallBackHandler.java) (Page 1/1) (Dec 04, 18 17:22) title
+border
+grestore
+(Printed by ) rhead
+(src/server/CallBackHandler.java) (29/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 30
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(import) K
+( java.rmi.RemoteException;) p n
+() N
+(public) K
+( ) p
+(interface) K
+( ) p
+(ICallback) L
+( ) p
+(extends) K
+( java.rmi.Remote {) p n
+(  ) S
+(public) K
+( ) p
+(void) k
+( NewCallback\(String serviceName, String[] data\) ) p
+(throws) K
+( RemoteExcept) p n
+(ion;) N
+(  ) S
+(public) K
+( ) p
+(void) k
+( NewCallback\(String serviceName, ) p
+(byte) k
+([][] data\) ) p
+(throws) K
+( RemoteExcept) p n
+(ion;) N
+(  ) S
+(public) K
+( ) p
+(void) k
+( NewExceptionCallback\(String serviceName, Exception exception\) ) p
+(thro) K n
+(ws) S
+( RemoteException;) p n
+(}) S
+(ICallback.java) (Page 1/1) (Dec 04, 18 17:10) title
+border
+grestore
+(Printed by ) rhead
+(src/server/ICallback.java) (30/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 31
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(public) K
+( ) p
+(interface) K
+( ) p
+(IService{) L n
+(  String[] run\(String[] data\) ) p
+(throws) K
+( Exception;) p n
+(  ) S
+(byte) k
+([][] run\() p
+(byte) k
+([][] data, String[] data2\) ) p
+(throws) K
+( Exception;) p n
+(}) S
+(IService.java) (Page 1/1) (Dec 05, 18 18:40) title
+border
+grestore
+(Printed by ) rhead
+(src/server/IService.java) (31/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 32
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(import) K
+( java.rmi.RemoteException;) p n
+() N
+(public) K
+( ) p
+(interface) K
+( ) p
+(IServiceInterface) L
+( ) p
+(extends) K
+( java.rmi.Remote {) p n
+(  ) S
+(public) K
+( String[] RunService\(String service, String[] data\) ) p
+(throws) K
+( RemoteExcepti) p n
+(on;) N
+(  ) S
+(public) K
+( ) p
+(boolean) k
+( RunServiceAsync\(String service, String[] data, String callbackP) p n
+(ort\) ) S
+(throws) K
+( RemoteException;) p n
+(  ) S
+(public) K
+( ) p
+(byte) k
+([][] RunService\(String service, ) p
+(byte) k
+([][] data, String[] data2\) ) p
+(thro) K n
+(ws) S
+( RemoteException;) p n
+(  ) S
+(public) K
+( ) p
+(boolean) k
+( RunServiceAsync\(String service, ) p
+(byte) k
+([][] data, String[] data2, ) p n
+(String callbackPort\) ) S
+(throws) K
+( RemoteException;) p n
+(}) S
+(IServiceInterface.java) (Page 1/1) (Dec 04, 18 16:35) title
+border
+grestore
+(Printed by ) rhead
+(src/server/IServiceInterface.java) (32/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 33
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(import) K
+( java.io.Serializable;) p n
+() N
+(public) K
+( ) p
+(interface) K
+( ) p
+(IServiceNode) L
+( ) p
+(extends) K
+( Serializable {) p n
+(  String getIp\(\);) N
+() N
+(  ) S
+(int) k
+( getPort\(\);) p n
+() N
+(  String[] getService\(\);) N
+(}) S
+(IServiceNode.java) (Page 1/1) (Dec 04, 18 12:30) title
+border
+grestore
+(Printed by ) rhead
+(src/server/IServiceNode.java) (33/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 34
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(import) K
+( java.io.File;) p n
+(import) K
+( java.io.FileInputStream;) p n
+(import) K
+( java.io.FileOutputStream;) p n
+(import) K
+( java.io.InputStream;) p n
+(import) K
+( java.rmi.registry.LocateRegistry;) p n
+(import) K
+( java.rmi.registry.Registry;) p n
+(import) K
+( java.util.Properties;) p n
+() N
+(public) K
+( ) p
+(class) K
+( ) p
+(Server) L
+( {) p n
+(  ) S
+(static) K
+( Registry r;) p n
+(  ) S
+(static) K
+( Properties p;) p n
+(  ) S
+(public) K
+( ) p
+(static) K
+( ) p
+(void) k
+( main\(String[] args\) {) p n
+(   Properties p = ) S
+(new) K
+( Properties\(\);) p n
+(   Server.p = p;) N
+(   ) S
+(// Load the config) c n
+(   File file = ) p
+(new) K
+( File\(") p
+(server.config.properties) str
+("\);) p n
+(   ) S
+(if) K
+( \(!file.exists\(\)\) {) p n
+(     ) S
+(try) K
+( {) p n
+(       System.out.println\(") S
+(Cant find properties file. Writing default.) str
+("\);) p n
+(       FileOutputStream out = ) S
+(new) K
+( FileOutputStream\(") p
+(server.config.properties) str
+("\);) p n
+(       p.put\(") S
+(tracker) str
+(", ") p
+(localhost:1099) str
+("\);) p n
+(       p.put\(") S
+(services) str
+(", ") p
+(VideoAnalytics,VideoSplit,ImageAnalytics,ImageAnalyticsGraph) str
+("\);) p n
+(       p.put\(") S
+(rmi_registry_host) str
+(", ") p
+(localhost) str
+("\);) p n
+(       p.put\(") S
+(rmi_registry_port) str
+(", ") p
+(1000) str
+("\);) p n
+(       p.put\(") S
+(image_analytics_model_dir) str
+(", ") p
+(models/ssd_inception_v2_coco_2017_11_17/saved_model) str
+("\);) p n
+(       p.put\(") S
+(image_analytics_label) str
+(", ") p
+(labels/mscoco_label_map.pbtxt) str
+("\);) p n
+(       p.put\(") S
+(image_analytics_simulate) str
+(", ") p
+(0) str
+("\);) p n
+(       p.put\(") S
+(ffmpeg_command) str
+(", ") p
+(./ffmpeg) str
+("\);) p n
+(       p.store\(out, ) S
+(null) k
+(\);) p n
+(     } ) S
+(catch) K
+( \(Exception e\) {) p n
+(       System.err.println\(") S
+(Unable to save file server.config.properties) str
+("\);) p n
+(       e.printStackTrace\(\);) N
+(       ) S
+(return) K
+(;) p n
+(     }) N
+(   } ) S
+(else) K
+( {) p n
+(     ) S
+(try) K
+( {) p n
+(      ) S
+(// If cant load config) c n
+(       FileInputStream in = ) p
+(new) K
+( FileInputStream\(") p
+(server.config.properties) str
+("\);) p n
+(       p.load\(in\);) N
+(     } ) S
+(catch) K
+( \(Exception e\) {) p n
+(       System.err.println\(") S
+(Unable to open file server.config.properties) str
+("\);) p n
+(       e.printStackTrace\(\);) N
+(       ) S
+(return) K
+(;) p n
+(     }) N
+(   }) N
+(   ) S
+(try) K
+( {) p n
+(    ) S
+(// Set hostname of registry to {hostname} or not it will use first network i) c n
+(nterface and cause problems) N
+(     System.setProperty\(") p
+(java.rmi.server.hostname) str
+(",p.getProperty\(") p
+(rmi_registry_host) str
+("\)\);) p n
+(     ) S
+(// Parse RMI Registry port) c n
+(     ) p
+(int) k
+( port = Integer.parseInt\(p.get\(") p
+(rmi_registry_port) str
+("\).toString\(\)\);) p n
+(     ) S
+(// Create a local registry so user does not need to) c n
+(     r = LocateRegistry.createRegistry\(port\);) p n
+(   } ) S
+(catch) K
+( \(Exception e\) {) p n
+(     e.printStackTrace\(\);) N
+(     ) S
+(return) K
+(;) p n
+(   }) N
+(   ) S
+(// Start server) c n
+(   ) p
+(new) K
+( ServerService\(p\).run\(\);) p n
+(  }) N
+(}) N
+(Server.java) (Page 1/1) (Dec 05, 18 19:14) title
+border
+grestore
+(Printed by ) rhead
+(src/server/Server.java) (34/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 35
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(import) K
+( java.rmi.Naming;) p n
+(import) K
+( java.text.MessageFormat;) p n
+(import) K
+( java.util.Map;) p n
+(import) K
+( java.util.Properties;) p n
+() N
+(public) K
+( ) p
+(class) K
+( ) p
+(ServerService) L
+( {) p n
+(  ) S
+(class) K
+( ) p
+(ShutdownThread) L
+( ) p
+(extends) K
+( Thread{) p n
+(    ) S
+(public) K
+( TrackerInterface t;) p n
+(    ) S
+(public) K
+( Properties properties;) p n
+(    @Override) N
+(    ) S
+(public) K
+( ) p
+(void) k
+( run\(\) {) p n
+(      ) S
+(// Function that delist itself from tracker) c n
+(      ) p
+(try) K
+( {) p n
+(        System.out.println\(") S
+(Removing myself from tracker.) str
+("\);) p n
+(        t.RemoveMe\(properties.getProperty\(") S
+(rmi_registry_host) str
+("\)\);) p n
+(      } ) S
+(catch) K
+( \(Exception e\) {) p n
+(        e.printStackTrace\(\);) N
+(      }) N
+(    }) N
+(  }) N
+(  Properties properties;) N
+(  String[] services;) N
+(  ) S
+(public) K
+( ) p
+(static) K
+( TrackerInterface t;) p n
+() N
+(  ServerService\(Properties p\) {) N
+(    properties = p;) N
+(    p.list\(System.out\);) N
+(    services = p.get\(") S
+(services) str
+("\).toString\(\).split\(") p
+(,) str
+("\);) p n
+(  }) N
+() N
+(  ) S
+(void) k
+( run\(\) {) p n
+(    ) S
+(try) K
+( {) p n
+(      ) S
+(// Create a new shutdown thread) c n
+(      ShutdownThread st = ) p
+(new) K
+( ShutdownThread\(\);) p n
+(      st.properties = properties;) N
+(      ) S
+(// Add shutdown thread to hook incase user use ctrl+c to stop the app) c n
+(      Runtime.getRuntime\(\).addShutdownHook\(st\);) p n
+(      ) S
+(// Look for the tracker) c n
+(      t = \(TrackerInterface\) Naming.lookup\(MessageFormat.format\(") p
+(rmi://{0}/TrackerServ) str n
+(ice) S
+(", properties.get\(") p
+(tracker) str
+("\)\)\);) p n
+(      st.t = t;) N
+(      ) S
+(// Advertise itself to the tracker) c n
+(      t.RegisterMeAsService\(services, Integer.parseInt\(properties.get\(") p
+(rmi_registry) str n
+(_port) S
+("\).toString\(\)\), properties.getProperty\(") p
+(rmi_registry_host) str
+("\)\);) p n
+(      System.out.println\(") S
+(Connected to tracker) str
+("\);) p n
+(      IServiceInterface service = ) S
+(new) K
+( ServiceImpl\(\);) p n
+(      ) S
+(// Create new service instance and bind it) c n
+(      Naming.rebind\(MessageFormat.format\(") p
+(rmi://{0}/Service) str
+(", properties.getProperty\() p n
+(") S
+(rmi_registry_host) str
+("\) + ") p
+(:) str
+(" + properties.getProperty\(") p
+(rmi_registry_port) str
+("\)\), service\);) p n
+(      System.out.println\(") S
+(Service Published) str
+("\);) p n
+(    } ) S
+(catch) K
+( \(Exception e\) {) p n
+(      e.printStackTrace\(\);) N
+(    }) N
+(  }) N
+(}) S
+(ServerService.java) (Page 1/1) (Dec 05, 18 19:15) title
+border
+grestore
+(Printed by ) rhead
+(src/server/ServerService.java) (35/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1-2) 36
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(import) K
+( java.io.BufferedReader;) p n
+(import) K
+( java.io.File;) p n
+(import) K
+( java.io.FileOutputStream;) p n
+(import) K
+( java.io.InputStream;) p n
+(import) K
+( java.io.InputStreamReader;) p n
+(import) K
+( java.nio.file.Files;) p n
+(import) K
+( java.nio.file.Path;) p n
+(import) K
+( java.util.ArrayList;) p n
+(import) K
+( java.util.Arrays;) p n
+() N
+(public) K
+( ) p
+(class) K
+( ) p
+(ServiceImageAnalytics) L
+( ) p
+(implements) K
+( IService {) p n
+(  ) S
+(public) K
+( String[] run\(String[] data\) ) p
+(throws) K
+( Exception {) p n
+(    ) S
+(throw) K
+( ) p
+(new) K
+( Exception\(") p
+(This is not implemented. Please use byte[][] variant.) str
+("\);) p n
+(  }) N
+(  ) S
+(// data[0] Array of bytes) c n
+(  ) p
+(// data[0][0] bytes of Images) c n
+(  ) p
+(// data2 not used) c n
+(  ) p
+(public) K
+( ) p
+(byte) k
+([][] run\() p
+(byte) k
+([][] data, String[] data2\) ) p
+(throws) K
+( Exception {) p n
+(    ) S
+(// If Simulate is on, use hard coded value) c n
+(    ) p
+(if) K
+(\(Server.p.getProperty\(") p
+(image_analytics_simulate) str
+("\).equals\(") p
+(0) str
+("\)\){) p n
+(      ) S
+(return) K
+( ExecuteImageAnalytics\(data\);) p n
+(    }) N
+(    ) S
+(return) K
+( ExecuteImageAnalyticsSimulate\(\);) p n
+(  }) N
+(  ) S
+(// Execute tensor flow detect object) c n
+(  ) p
+(private) K
+( ) p
+(byte) k
+([][] ExecuteImageAnalytics\() p
+(byte) k
+([][] data\) ) p
+(throws) K
+( Exception{) p n
+(    ) S
+(// Generate CSV file) c n
+(    File csvFile = ) p
+(new) K
+( File\(") p
+(out.csv) str
+("\);) p n
+(    ArrayList<String> cmdA = ) S
+(new) K
+( ArrayList<>\(\);) p n
+(    cmdA.add\(") S
+(java) str
+("\);) p n
+(    cmdA.add\(") S
+(-jar) str
+("\);) p n
+(    cmdA.add\(") S
+(detect-object.jar) str
+("\);) p n
+(    cmdA.add\(Server.p.getProperty\(") S
+(image_analytics_model_dir) str
+("\)\);) p n
+(    cmdA.add\(Server.p.getProperty\(") S
+(image_analytics_label) str
+("\)\);) p n
+(    cmdA.add\(csvFile.toString\(\)\);) N
+(    ) S
+(try) K
+( {) p n
+(      ) S
+(// Write the image to disk) c n
+(      File basePath = ) p
+(new) K
+( File\(") p
+(image_analytics) str
+("\);) p n
+(      basePath.mkdir\(\);) N
+(      File dir = Files.createTempDirectory\(basePath.toPath\(\), ") S
+(image_analytics) str
+("\).toF) p n
+(ile\(\);) N
+(      ) S
+(for) K
+( \() p
+(int) k
+( i = 0; i < data.length; i++\) {) p n
+(        File f = ) S
+(new) K
+( File\(dir, i + ") p
+(.png) str
+("\);) p n
+(        ) S
+(byte) k
+([] b = data[i];) p n
+(        ) S
+(try) K
+( \(FileOutputStream fos = ) p
+(new) K
+( FileOutputStream\(f\)\) {) p n
+(          fos.write\(b\);) N
+(        }) N
+(      ) S
+(// Add to command) c n
+(        cmdA.add\(f.toString\(\)\);) p n
+(      }) N
+(    } ) S
+(catch) K
+( \(Exception e\) {) p n
+(      e.printStackTrace\(\);) N
+(      ) S
+(throw) K
+( e;) p n
+(    }) N
+(    ) S
+(try) K
+( {) p n
+(      String[] cmd = ) S
+(new) K
+( String[cmdA.size\(\)];) p n
+(      cmdA.toArray\(cmd\);) N
+(      System.out.println\(Arrays.toString\(cmd\)\);) N
+(      ) S
+(// Call the tensor flow jar file to process images) c n
+(      ProcessBuilder ps = ) p
+(new) K
+( ProcessBuilder\(cmd\);) p n
+(      ps.redirectErrorStream\() S
+(true) k
+(\);) p n
+(      Process pr = ps.start\(\);) N
+(ServiceImageAnalytics.java) (Page 1/2) (Dec 05, 18 19:27) title
+border
+/v 1 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(      ) p
+(// Read the output stream) c n
+(      BufferedReader in = ) p
+(new) K
+( BufferedReader\() p
+(new) K
+( InputStreamReader\(pr.getInputSt) p n
+(ream\(\)\)\);) N
+(      String line;) N
+(      ) S
+(while) K
+( \(\(line = in.readLine\(\)\) != ) p
+(null) k
+(\) {) p n
+(          System.out.println\(line\);) N
+(      }) N
+(      in.close\(\);) N
+(      pr.waitFor\(\);) N
+(    } ) S
+(catch) K
+( \(Exception e\) {) p n
+(      e.printStackTrace\(\);) N
+(      ) S
+(throw) K
+( e;) p n
+(    }) N
+(    ) S
+(try) K
+( {) p n
+(      ) S
+(// Read the csv file and return it) c n
+(      ) p
+(return) K
+( ) p
+(new) K
+( ) p
+(byte) k
+([][] { Files.readAllBytes\(csvFile.toPath\(\)\) };) p n
+(    } ) S
+(catch) K
+( \(Exception e\) {) p n
+(      e.printStackTrace\(\);) N
+(      ) S
+(throw) K
+( e;) p n
+(    }) N
+(  }) N
+(  ) S
+(private) K
+( ) p
+(byte) k
+([][] ExecuteImageAnalyticsSimulate\(\){) p n
+(    ) S
+(return) K
+( ) p
+(new) K
+( ) p
+(byte) k
+([][]{") p
+(cat,15\\ndog,11\\nturtle,22\\nbob,100\\norrange,3) str
+(".getBytes\(\)};) p n
+(  }) N
+(}) S
+(ServiceImageAnalytics.java) (Page 2/2) (Dec 05, 18 19:27) title
+border
+grestore
+(Printed by ) rhead
+(src/server/ServiceImageAnalytics.java) (36/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 37
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(import) K
+( org.knowm.xchart.BitmapEncoder;) p n
+(import) K
+( org.knowm.xchart.PieChart;) p n
+(import) K
+( org.knowm.xchart.PieChartBuilder;) p n
+() N
+(import) K
+( java.io.IOException;) p n
+() N
+(public) K
+( ) p
+(class) K
+( ) p
+(ServiceImageAnalyticsGraph) L
+( ) p
+(implements) K
+( IService {) p n
+(  ) S
+(public) K
+( String[] run\(String[] data\) ) p
+(throws) K
+( Exception {) p n
+(    ) S
+(throw) K
+( ) p
+(new) K
+( Exception\(") p
+(This is not implemented. Please use byte[][] variant.) str
+("\);) p n
+(  }) N
+() N
+(  ) S
+(// data[0] = csv content) c n
+(  ) p
+(// data2 not used) c n
+(  ) p
+(public) K
+( ) p
+(byte) k
+([][] run\() p
+(byte) k
+([][] data, String[] data2\) ) p
+(throws) K
+( Exception {) p n
+(    ) S
+(byte) k
+([] csvStringByte = data[0];) p n
+(    String csvString = ) S
+(new) K
+( String\(csvStringByte\);) p n
+(    ) S
+(// split the csv) c n
+(    String[] splitNewLineCsv = csvString.split\(") p
+(\\n) str
+("\);) p n
+(    ) S
+(// New piechart builder) c n
+(    PieChart chart = ) p
+(new) K
+( PieChartBuilder\(\).width\(800\).height\(600\).title\(") p
+(Pie Chart) str
+() p n
+("\).build\(\);) N
+(    chart.getStyler\(\).setCircular\() S
+(false) k
+(\);) p n
+(    ) S
+(// Add the items) c n
+(    ) p
+(for) K
+( \(String s : splitNewLineCsv\) {) p n
+(      String[] splitStr = s.split\(") S
+(,) str
+("\);) p n
+(      chart.addSeries\(splitStr[0], Integer.parseInt\(splitStr[1]\)\);) N
+(    }) N
+(    ) S
+(// Convert the image bitmap to byte) c n
+(    ) p
+(byte) k
+([] imageData;) p n
+(    ) S
+(try) K
+( {) p n
+(      imageData = BitmapEncoder.getBitmapBytes\(chart, BitmapEncoder.BitmapFormat) N
+(.PNG\);) N
+(    } ) S
+(catch) K
+( \(IOException e\) {) p n
+(      e.printStackTrace\(\);) N
+(      ) S
+(throw) K
+( e;) p n
+(    }) N
+(    ) S
+(// return it) c n
+(    ) p
+(return) K
+( ) p
+(new) K
+( ) p
+(byte) k
+([][] { imageData };) p n
+(  }) N
+(}) S
+(ServiceImageAnalyticsGraph.java) (Page 1/1) (Dec 05, 18 19:26) title
+border
+grestore
+(Printed by ) rhead
+(src/server/ServiceImageAnalyticsGraph.java) (37/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1-2) 38
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(import) K
+( java.net.MalformedURLException;) p n
+(import) K
+( java.rmi.Naming;) p n
+(import) K
+( java.rmi.NotBoundException;) p n
+(import) K
+( java.rmi.RemoteException;) p n
+(import) K
+( java.text.MessageFormat;) p n
+() N
+(public) K
+( ) p
+(class) K
+( ) p
+(ServiceImpl) L
+( ) p
+(extends) K
+( java.rmi.server.UnicastRemoteObject ) p
+(implements) K
+( I) p n
+(ServiceInterface {) N
+(  ) S
+(private) K
+( CallBackHandler callbackHandler;) p n
+() N
+(  ServiceImpl\(\) ) S
+(throws) K
+( RemoteException {) p n
+(    ) S
+(super) K
+(\(\);) p n
+(  }) N
+() N
+(  ) S
+(// Get the service to run via Reflection) c n
+(  ) p
+(private) K
+( IService getServiceClass\(String serviceName\)) p n
+(      ) S
+(throws) K
+( ClassNotFoundException, InstantiationException, IllegalAccessExcept) p n
+(ion {) N
+(    Class serviceClass = Class.forName\(") S
+(Service) str
+(" + serviceName\);) p n
+(    ) S
+(return) K
+( \(IService\) serviceClass.newInstance\(\);) p n
+(  }) N
+() N
+(  ) S
+(// Register client callback) c n
+(  ) p
+(private) K
+( ) p
+(void) k
+( RegisterCallback\(String host, String clientPort\)) p n
+(      ) S
+(throws) K
+( RemoteException, NotBoundException, MalformedURLException {) p n
+(    ) S
+(if) K
+( \(this.callbackHandler != ) p
+(null) k
+(\)) p n
+(      ) S
+(return) K
+(;) p n
+(    ICallback callback = \(ICallback\) Naming.lookup\(MessageFormat.format\(") S
+(rmi://{0}:) str n
+({1}/Callback) S
+(", host, clientPort\)\);) p n
+(    this.callbackHandler = ) S
+(new) K
+( CallBackHandler\(callback\);) p n
+(  }) N
+() N
+(  ) S
+(// Run the service \(String variant\). This function is synchronous.) c n
+(  ) p
+(public) K
+( String[] RunService\(String service, String[] data\) ) p
+(throws) K
+( RemoteExcepti) p n
+(on {) N
+(    ) S
+(try) K
+( {) p n
+(      ) S
+(return) K
+( getServiceClass\(service\).run\(data\);) p n
+(    } ) S
+(catch) K
+( \(Exception e\) {) p n
+(      e.printStackTrace\(\);) N
+(      ) S
+(throw) K
+( ) p
+(new) K
+( RemoteException\(") p
+(Unable to run service) str
+(", e\);) p n
+(    }) N
+(  }) N
+() N
+(  ) S
+(// Run the service \(String variant\). This function is asynchronous.) c n
+(  ) p
+(public) K
+( ) p
+(boolean) k
+( RunServiceAsync\(String service, String[] data, String callbackP) p n
+(ort\) ) S
+(throws) K
+( RemoteException {) p n
+(    ) S
+(try) K
+( {) p n
+(      ) S
+(// Get connecting client IP) c n
+(      String clientHost = getClientHost\(\);) p n
+(      ) S
+(// Create new callback) c n
+(      RegisterCallback\(clientHost, callbackPort\);) p n
+(    } ) S
+(catch) K
+( \(Exception e\) {) p n
+(      e.printStackTrace\(\);) N
+(      ) S
+(throw) K
+( ) p
+(new) K
+( RemoteException\(") p
+(Failed to register callback. Unable to get host) str
+(", e\);) p n
+(    }) N
+(    ) S
+(// Run execution in another thread so that the client does not need to wait) c n
+(    Thread t = ) p
+(new) K
+( Thread\(\(\) -> {) p n
+(      ) S
+(try) K
+( {) p n
+(        ) S
+(// Run Service) c n
+(        String[] result = RunService\(service, data\);) p n
+(        ) S
+(// Call client callback when execution finished) c n
+(        callbackHandler.ExecuteCallback\(service, result\);) p n
+(ServiceImpl.java) (Page 1/2) (Dec 05, 18 19:20) title
+border
+/v 1 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(      } ) p
+(catch) K
+( \(Exception e\) {) p n
+(        e.printStackTrace\(\);) N
+(        ) S
+(// Got an exception, tell client got exception via callback) c n
+(        callbackHandler.ExecuteExceptionCallback\(service, e\);) p n
+(      }) N
+(    }\);) N
+(    t.start\(\);) N
+(    ) S
+(return) K
+( ) p
+(true) k
+(;) p n
+(  }) N
+() N
+(  ) S
+(// Run the service \(Byte[][] variant\). This function is synchronous.) c n
+(  ) p
+(public) K
+( ) p
+(byte) k
+([][] RunService\(String service, ) p
+(byte) k
+([][] data, String[] data2\) ) p
+(thro) K n
+(ws) S
+( RemoteException {) p n
+(    ) S
+(try) K
+( {) p n
+(      ) S
+(return) K
+( getServiceClass\(service\).run\(data, data2\);) p n
+(    } ) S
+(catch) K
+( \(Exception e\) {) p n
+(      e.printStackTrace\(\);) N
+(      ) S
+(throw) K
+( ) p
+(new) K
+( RemoteException\(") p
+(Unable to run service) str
+(", e\);) p n
+(    }) N
+(  }) N
+() N
+(  ) S
+(// Run the service \(Byte[][] variant\). This function is asynchronous.) c n
+(  ) p
+(public) K
+( ) p
+(boolean) k
+( RunServiceAsync\(String service, ) p
+(byte) k
+([][] data, String[] data2, ) p n
+(String callbackPort\)) N
+(      ) S
+(throws) K
+( RemoteException {) p n
+(    ) S
+(try) K
+( {) p n
+(      ) S
+(// Get connecting client IP) c n
+(      String clientHost = getClientHost\(\);) p n
+(      ) S
+(// Create new callback) c n
+(      RegisterCallback\(clientHost, callbackPort\);) p n
+(    } ) S
+(catch) K
+( \(Exception e\) {) p n
+(      e.printStackTrace\(\);) N
+(      ) S
+(throw) K
+( ) p
+(new) K
+( RemoteException\(") p
+(Failed to register callback. Unable to get host) str
+(", e\);) p n
+(    }) N
+(    ) S
+(// Run execution in another thread so that the client does not need to wait) c n
+(    Thread t = ) p
+(new) K
+( Thread\(\(\) -> {) p n
+(      ) S
+(try) K
+( {) p n
+(        ) S
+(// Run Service) c n
+(        ) p
+(byte) k
+([][] result = RunService\(service, data, data2\);) p n
+(        ) S
+(// Call client callback when execution finished) c n
+(        callbackHandler.ExecuteCallback\(service, result\);) p n
+(      } ) S
+(catch) K
+( \(Exception e\) {) p n
+(        e.printStackTrace\(\);) N
+(        ) S
+(// Got an exception, tell client got exception via callback) c n
+(        callbackHandler.ExecuteExceptionCallback\(service, e\);) p n
+(      }) N
+(    }\);) N
+(    t.start\(\);) N
+(    ) S
+(return) K
+( ) p
+(true) k
+(;) p n
+(  }) N
+(}) S
+(ServiceImpl.java) (Page 2/2) (Dec 05, 18 19:20) title
+border
+grestore
+(Printed by ) rhead
+(src/server/ServiceImpl.java) (38/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 39
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(public) K
+( ) p
+(class) K
+( ) p
+(ServiceNode) L
+( ) p
+(implements) K
+( IServiceNode {) p n
+(  ) S
+(public) K
+( String Ip;) p n
+(  ) S
+(public) K
+( ) p
+(int) k
+( Port; ) p n
+(  ) S
+(public) K
+( String[] Services;) p n
+() N
+(  ) S
+(public) K
+( String getIp\(\){) p n
+(    ) S
+(return) K
+( Ip;) p n
+(  }) N
+(  ) S
+(public) K
+( ) p
+(int) k
+( getPort\(\){) p n
+(    ) S
+(return) K
+( Port;) p n
+(  }) N
+(  ) S
+(public) K
+( String[] getService\(\){) p n
+(    ) S
+(return) K
+( Services;) p n
+(  }) N
+() N
+(  @Override) N
+(  ) S
+(public) K
+( ) p
+(int) k
+( hashCode\(\) {) p n
+(    ) S
+(int) k
+( hc = 0;) p n
+(    ) S
+(for) K
+( \(String s : Services\) {) p n
+(      hc += s.hashCode\(\);) N
+(    }) N
+(    ) S
+(return) K
+( Ip.hashCode\(\) + hc;) p n
+(  }) N
+(}) S
+(ServiceNode.java) (Page 1/1) (Dec 04, 18 12:40) title
+border
+grestore
+(Printed by ) rhead
+(src/server/ServiceNode.java) (39/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1-2) 40
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(import) K
+( java.rmi.Naming;) p n
+(import) K
+( java.text.MessageFormat;) p n
+(import) K
+( java.util.ArrayList;) p n
+(import) K
+( java.util.HashMap;) p n
+(import) K
+( java.util.Map;) p n
+() N
+(class) K
+( ) p
+(ServiceVideoAnalytics) L
+( ) p
+(implements) K
+( IService {) p n
+(  ) S
+(public) K
+( String[] run\(String[] data\) ) p
+(throws) K
+( Exception {) p n
+(    ) S
+(throw) K
+( ) p
+(new) K
+( Exception\(") p
+(This is not implemented. Please use byte[][] variant.) str
+("\);) p n
+(  }) N
+() N
+(  ) S
+(// data[0] = video file) c n
+(  ) p
+(// data2[0] = filename) c n
+(  ) p
+(public) K
+( ) p
+(byte) k
+([][] run\() p
+(byte) k
+([][] data, String[] data2\) ) p
+(throws) K
+( Exception {) p n
+(    ) S
+(// Setup all service nodes first before executing) c n
+(    ArrayList<IServiceInterface> videoSplitNode = GetServices\(") p
+(VideoSplit) str
+(", 1\);) p n
+(    ArrayList<IServiceInterface> imageAnalyticsNode = GetServices\(") S
+(ImageAnalytics) str
+(",) p n
+( 4\);) N
+(    ArrayList<IServiceInterface> imageAnalyticsGraphNode = GetServices\(") S
+(ImageAnal) str n
+(yticsGraph) S
+(", 1\);) p n
+(    ) S
+(// If one of the service have no node, tell throw error) c n
+(    ) p
+(if) K
+( \(videoSplitNode == ) p
+(null) k
+( || imageAnalyticsNode == ) p
+(null) k
+( || imageAnalyticsGr) p n
+(aphNode == ) S
+(null) k
+(\) {) p n
+(      System.err.println\(") S
+(Unable to find one of the node.) str
+("\);) p n
+(      ) S
+(throw) K
+( ) p
+(new) K
+( Exception\(") p
+(Unable to find one of the node.) str
+("\);) p n
+(    }) N
+(    ) S
+(byte) k
+([][] fileBytes = GenerateVideoThumb\(data[0], data2[0], videoSplitNode.ge) p n
+(t\(0\)\);) N
+(    ) S
+(byte) k
+([] nameToOccurance = ImageAnalytics\(fileBytes, imageAnalyticsNode\);) p n
+(    ) S
+(byte) k
+([] graphImg = GraphIt\(nameToOccurance, imageAnalyticsGraphNode.get\(0\)\);) p n
+(    ) S
+(return) K
+( ) p
+(new) K
+( ) p
+(byte) k
+([][]{graphImg};) p n
+(  }) N
+() N
+(  ) S
+(// Call the split video service node) c n
+(  ) p
+(private) K
+( ) p
+(byte) k
+([][] GenerateVideoThumb\() p
+(byte) k
+([] data, String filename, IServiceInte) p n
+(rface service\) ) S
+(throws) K
+( Exception {) p n
+(    ) S
+(byte) k
+([][] fileBytes;) p n
+(    ) S
+(try) K
+( {) p n
+(      fileBytes = service.RunService\(") S
+(VideoSplit) str
+(", ) p
+(new) K
+( ) p
+(byte) k
+([][] { data }, ) p
+(new) K
+( Stri) p n
+(ng[] { filename }\);) N
+(    } ) S
+(catch) K
+( \(Exception e\) {) p n
+(      e.printStackTrace\(\);) N
+(      ) S
+(throw) K
+( e;) p n
+(    }) N
+(    ) S
+(return) K
+( fileBytes;) p n
+(  }) N
+() N
+(  ) S
+(// Split the task to \(max of 4\) nodes ) c n
+(  ) p
+(private) K
+( ) p
+(byte) k
+([] ImageAnalytics\() p
+(byte) k
+([][] files, ArrayList<IServiceInterface> ser) p n
+(vices\) ) S
+(throws) K
+( Exception {) p n
+(    ArrayList<) S
+(byte) k
+([]>[] splitedFiles = SplitFiles\(files, services.size\(\)\);) p n
+(    Thread[] threads = ) S
+(new) K
+( Thread[services.size\(\)];) p n
+(    ) S
+(byte) k
+([][] result = ) p
+(new) K
+( ) p
+(byte) k
+([services.size\(\)][];) p n
+(    ) S
+(for) K
+( \() p
+(int) k
+( i = 0; i < services.size\(\); i++\) {) p n
+(      ) S
+(final) K
+( ) p
+(int) k
+( index = i;) p n
+(      ) S
+(final) K
+( ArrayList<) p
+(byte) k
+([]> filesToRun = splitedFiles[i];) p n
+(      ) S
+(final) K
+( IServiceInterface serviceToRunAt = services.get\(i\);) p n
+(      ) S
+(// Create threads for each service to call. so can simultaneous calls) c n
+(      Thread t = ) p
+(new) K
+( Thread\(\(\) -> {) p n
+(        ) S
+(byte) k
+([][] bts = ) p
+(new) K
+( ) p
+(byte) k
+([filesToRun.size\(\)][];) p n
+(        ) S
+(for) K
+( \() p
+(int) k
+( y = 0; y < filesToRun.size\(\); y++\) {) p n
+(          ) S
+(try) K
+( {) p n
+(ServiceVideoAnalytics.java) (Page 1/3) (Dec 05, 18 19:26) title
+border
+/v 1 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(            bts[y] = filesToRun.get\(y\);) p n
+(          } ) S
+(catch) K
+( \(Exception e\) {) p n
+(            e.printStackTrace\(\);) N
+(          }) N
+(        }) N
+(        ) S
+(try) K
+( {) p n
+(          System.out.println\(") S
+(Running service with T: ) str
+(" + Thread.currentThread\(\).getId\() p n
+(\)\);) N
+(          ) S
+(byte) k
+([][] r = serviceToRunAt.RunService\(") p
+(ImageAnalytics) str
+(", bts, ) p
+(null) k
+(\);) p n
+(          result[index] = r[0];) N
+(        } ) S
+(catch) K
+( \(Exception e\) {) p n
+(          e.printStackTrace\(\);) N
+(        }) N
+(      }\);) N
+(      t.start\(\);) N
+(      threads[i] = t;) N
+(    }) N
+(    ) S
+(// Wait for all nodes to finish) c n
+(    ) p
+(for) K
+( \() p
+(int) k
+( i = 0; i < threads.length; i++\) {) p n
+(      ) S
+(try) K
+( {) p n
+(        threads[i].join\(\);) N
+(      } ) S
+(catch) K
+( \(Exception e\) {) p n
+(        e.printStackTrace\(\);) N
+(        ) S
+(throw) K
+( e;) p n
+(      }) N
+(    }) N
+(    ) S
+(// Combine the result of all nodes) c n
+(    StringBuilder sb = ) p
+(new) K
+( StringBuilder\(\);) p n
+(    Map<String, Integer> nameToOccurance = ) S
+(new) K
+( HashMap<>\(\);) p n
+(    ) S
+(for) K
+( \() p
+(int) k
+( i = 0; i < result.length; i++\) {) p n
+(      ) S
+(byte) k
+([] csvB = result[i];) p n
+(      ) S
+(if) K
+(\(csvB == ) p
+(null) k
+(\){) p n
+(        ) S
+(continue) K
+(;) p n
+(      }) N
+(      String csvContent = ) S
+(new) K
+( String\(csvB\);) p n
+(      csvContent = csvContent.replace\(") S
+(\\r) str
+(", ""\);) p n
+(      String[] newLineSplit = csvContent.split\(") S
+(\\n) str
+("\);) p n
+(      ) S
+(for) K
+( \(String s : newLineSplit\) {) p n
+(        ) S
+(if) K
+( \(!s.equals\(""\)\) {) p n
+(          String name = s.split\(") S
+(,) str
+("\)[0];) p n
+(          ) S
+(if) K
+( \(nameToOccurance.get\(name\) == ) p
+(null) k
+(\) {) p n
+(            nameToOccurance.put\(name, 0\);) N
+(          }) N
+(          nameToOccurance.put\(name, nameToOccurance.get\(name\) + 1\);) N
+(        }) N
+(      }) N
+(    }) N
+(    ) S
+(if) K
+(\(nameToOccurance.keySet\(\).size\(\) == 0\){) p n
+(      ) S
+(throw) K
+( ) p
+(new) K
+( Exception\(") p
+(No result from Image Analytics.) str
+("\);) p n
+(    }) N
+(    ) S
+(for) K
+( \(String key : nameToOccurance.keySet\(\)\) {) p n
+(      sb.append\(key\).append\(") S
+(,) str
+("\).append\(nameToOccurance.get\(key\)\).append\(") p
+(\\n) str
+("\);) p n
+(    }) N
+(    System.out.println\(") S
+(CSV Return: ) str
+(" + sb.toString\(\)\);) p n
+(    ) S
+(return) K
+( sb.toString\(\).getBytes\(\);) p n
+(  }) N
+() N
+(  ) S
+(// Call the Graph node) c n
+(  ) p
+(private) K
+( ) p
+(byte) k
+([] GraphIt\() p
+(byte) k
+([] nameToOccuranceCsv, IServiceInterface service\) ) p
+(t) K n
+(hrows) S
+( Exception{) p n
+(    ) S
+(byte) k
+([][] fileBytes;) p n
+(    ) S
+(try) K
+( {) p n
+(ServiceVideoAnalytics.java) (Page 2/3) (Dec 05, 18 19:26) title
+border
+grestore
+(Printed by ) rhead
+(src/server/ServiceVideoAnalytics.java) (40/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (3) 41
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(      fileBytes = service.RunService\(") p
+(ImageAnalyticsGraph) str
+(", ) p
+(new) K
+( ) p
+(byte) k
+([][] { nameToOcc) p n
+(uranceCsv }, ) S
+(null) k
+(\);) p n
+(    } ) S
+(catch) K
+( \(Exception e\) {) p n
+(      e.printStackTrace\(\);) N
+(      ) S
+(throw) K
+( e;) p n
+(    }) N
+(    ) S
+(return) K
+( fileBytes[0];) p n
+(  }) N
+() N
+(  ) S
+(// Split files to nodes) c n
+(  ) p
+(private) K
+( ArrayList<) p
+(byte) k
+([]>[] SplitFiles\() p
+(byte) k
+([][] files, ) p
+(int) k
+( parts\) {) p n
+(    ArrayList<) S
+(byte) k
+([]>[] splitedFiles = ) p
+(new) K
+( ArrayList[parts];) p n
+(    ) S
+(for) K
+( \() p
+(int) k
+( i = 0; i < parts; i++\) {) p n
+(      splitedFiles[i] = ) S
+(new) K
+( ArrayList<) p
+(byte) k
+([]>\(\);) p n
+(    }) N
+(    ) S
+(for) K
+( \() p
+(int) k
+( i = 0; i < files.length; i++\) {) p n
+(      splitedFiles[i % parts].add\(files[i]\);) N
+(    }) N
+(    ) S
+(return) K
+( splitedFiles;) p n
+(  }) N
+() N
+(  ) S
+(private) K
+( ArrayList<IServiceInterface> GetServices\(String serviceName, ) p
+(int) k
+( max\) ) p n
+({) N
+(    ArrayList<IServiceInterface> services = ) S
+(new) K
+( ArrayList<>\(\);) p n
+(    ) S
+(try) K
+( {) p n
+(      IServiceNode[] sn = \(IServiceNode[]\)ServerService.t.GetMeService\(serviceNa) N
+(me\);) N
+(      ) S
+(for) K
+( \(IServiceNode s : sn\) {) p n
+(        ) S
+(try) K
+( {) p n
+(          services.add\(\(IServiceInterface\) Naming) N
+(              .lookup\(MessageFormat.format\(") S
+(rmi://{0}/Service) str
+(", s.getIp\(\) + ") p
+(:) str
+(" + s.g) p n
+(etPort\(\)\)\)\);) N
+(          ) S
+(if) K
+( \(services.size\(\) == max\) {) p n
+(            ) S
+(break) K
+(;) p n
+(          }) N
+(        } ) S
+(catch) K
+( \(Exception e\) {) p n
+(          e.printStackTrace\(\);) N
+(          System.out.println\(MessageFormat.format\(") S
+(Cant get service with ip {0}. Next.) str
+(", s.) p n
+(getIp\(\)\)\);) N
+(        }) N
+(      }) N
+(    } ) S
+(catch) K
+( \(Exception e\) {) p n
+(      e.printStackTrace\(\);) N
+(      ) S
+(return) K
+( ) p
+(null) k
+(;) p n
+(    }) N
+(    ) S
+(if) K
+( \(services.size\(\) == 0\) {) p n
+(      System.err.println\(") S
+(Unable to fine any node named ) str
+(" + serviceName\);) p n
+(      ) S
+(return) K
+( ) p
+(null) k
+(;) p n
+(    }) N
+(    ) S
+(return) K
+( services;) p n
+(  }) N
+(}) S
+(ServiceVideoAnalytics.java) (Page 3/3) (Dec 05, 18 19:26) title
+border
+grestore
+(Printed by ) rhead
+(src/server/ServiceVideoAnalytics.java) (41/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1-2) 42
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(import) K
+( java.io.BufferedReader;) p n
+(import) K
+( java.io.File;) p n
+(import) K
+( java.io.FileOutputStream;) p n
+(import) K
+( java.io.InputStream;) p n
+(import) K
+( java.io.InputStreamReader;) p n
+(import) K
+( java.nio.file.Files;) p n
+(import) K
+( java.util.Arrays;) p n
+() N
+(class) K
+( ) p
+(ServiceVideoSplit) L
+( ) p
+(implements) K
+( IService {) p n
+(  ) S
+(public) K
+( String[] run\(String[] data\) ) p
+(throws) K
+( Exception {) p n
+(    ) S
+(throw) K
+( ) p
+(new) K
+( Exception\(") p
+(This is not implemented. Please use byte[][] variant.) str
+("\);) p n
+(  }) N
+() N
+(  ) S
+(// data[0] = video file) c n
+(  ) p
+(// data2[0] = filename) c n
+(  ) p
+(public) K
+( ) p
+(byte) k
+([][] run\() p
+(byte) k
+([][] data, String[] data2\) ) p
+(throws) K
+( Exception {) p n
+(    ) S
+(try) K
+( {) p n
+(      ) S
+(// Save the video file) c n
+(      ) p
+(new) K
+( File\(") p
+(temp/) str
+("\).mkdirs\(\);) p n
+(      ) S
+(new) K
+( File\(") p
+(temp/) str
+(" + data2[0] + ") p
+(out/) str
+("\).mkdirs\(\);) p n
+(      ) S
+(try) K
+( \(FileOutputStream fos = ) p
+(new) K
+( FileOutputStream\(") p
+(temp/) str
+(" + data2[0]\)\) {) p n
+(        fos.write\(data[0]\);) N
+(      }) N
+(    } ) S
+(catch) K
+( \(Exception e\) {) p n
+(      e.printStackTrace\(\);) N
+(      ) S
+(throw) K
+( e;) p n
+(    }) N
+(    ) S
+(// split file) c n
+(    ) p
+(try) K
+( {) p n
+(      ) S
+(// Setup cmd) c n
+(      String[] cmd = { Server.p.getProperty\(") p
+(ffmpeg_command) str
+("\), ") p
+(-i) str
+(", ") p
+(temp/) str
+(" + data) p n
+(2[0], ") S
+(-vf) str
+(", ") p
+(scale=720:-1,fps=4) str
+(",) p n
+(          ") S
+(temp/) str
+(" + data2[0] + ") p
+(out/out%d.png) str
+(" };) p n
+(      System.out.println\(Arrays.toString\(cmd\)\);) N
+(      ProcessBuilder ps = ) S
+(new) K
+( ProcessBuilder\(cmd\);) p n
+(      ps.redirectErrorStream\() S
+(true) k
+(\);) p n
+(      ) S
+(// Call ffmpeg to split video 4 frames per seconds) c n
+(      Process pr = ps.start\(\);) p n
+(      ) S
+(// Read the output stream) c n
+(      BufferedReader in = ) p
+(new) K
+( BufferedReader\() p
+(new) K
+( InputStreamReader\(pr.getInputSt) p n
+(ream\(\)\)\);) N
+(      String line;) N
+(      ) S
+(while) K
+( \(\(line = in.readLine\(\)\) != ) p
+(null) k
+(\) {) p n
+(        System.out.println\(line\);) N
+(      }) N
+(      in.close\(\);) N
+(      pr.waitFor\(\);) N
+(      ) S
+(if) K
+( \(pr.exitValue\(\) != 0\)) p n
+(        ) S
+(throw) K
+( ) p
+(new) K
+( Exception\(") p
+(ffmpeg return non 0 exit code.) str
+("\);) p n
+(    } ) S
+(catch) K
+( \(Exception e\) {) p n
+(      e.printStackTrace\(\);) N
+(      ) S
+(throw) K
+( e;) p n
+(    }) N
+(    ) S
+(// Read the output image files as byte) c n
+(    File dir = ) p
+(new) K
+( File\(") p
+(temp/) str
+(" + data2[0] + ") p
+(out/) str
+("\);) p n
+(    File[] files = dir.listFiles\(\);) N
+(    ) S
+(byte) k
+([][] bytes = ) p
+(new) K
+( ) p
+(byte) k
+([files.length][];) p n
+(    ) S
+(for) K
+( \() p
+(int) k
+( i = 0; i < files.length; i++\) {) p n
+(      ) S
+(try) K
+( {) p n
+(        bytes[i] = Files.readAllBytes\(files[i].toPath\(\)\);) N
+(      } ) S
+(catch) K
+( \(Exception e\) {) p n
+(        e.printStackTrace\(\);) N
+(ServiceVideoSplit.java) (Page 1/2) (Dec 05, 18 19:28) title
+border
+/v 1 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(      }) p n
+(    }) N
+(    ) S
+(return) K
+( bytes;) p n
+(  }) N
+(}) S
+(ServiceVideoSplit.java) (Page 2/2) (Dec 05, 18 19:28) title
+border
+grestore
+(Printed by ) rhead
+(src/server/ServiceVideoSplit.java) (42/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 43
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(import) K
+( java.rmi.RemoteException;) p n
+(import) K
+( java.rmi.server.ServerNotActiveException;) p n
+() N
+(public) K
+( ) p
+(interface) K
+( ) p
+(TrackerInterface) L
+( ) p
+(extends) K
+( java.rmi.Remote {) p n
+(  ) S
+(public) K
+( Boolean RegisterMeAsService\(String[] services, ) p
+(int) k
+( port, String ipAddr\)) p n
+( ) S
+(throws) K
+( RemoteException;) p n
+() N
+(  ) S
+(public) K
+( IServiceNode[] GetMeService\(String service\) ) p
+(throws) K
+( RemoteException;) p n
+(  ) N
+(  ) S
+(public) K
+( IServiceNode[] GetMeServices\(String[] services\) ) p
+(throws) K
+( RemoteException;) p n
+() N
+(  ) S
+(public) K
+( Boolean RemoveMe\(String ipAddr\) ) p
+(throws) K
+( RemoteException, ServerNotActive) p n
+(Exception;) N
+(}) S
+(TrackerInterface.java) (Page 1/1) (Dec 04, 18 19:30) title
+border
+grestore
+(Printed by ) rhead
+(src/server/TrackerInterface.java) (43/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 44
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(mkdir bin) p n
+(javac -classpath ../../lib/detect-object.jar;../../lib/xchart-3.5.2.jar -d bin *) N
+(.java) N
+(if %errorlevel% neq 0 exit /b %errorlevel%) N
+(copy manifest.txt bin) N
+(cd bin) N
+(jar cvfm server.jar manifest.txt *.class) N
+(cd ../) S
+(build.bat) (Page 1/1) (Dec 04, 18 15:16) title
+border
+grestore
+(Printed by ) rhead
+(src/server/build.bat) (44/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 45
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(mkdir -p bin) p n
+(javac -classpath ') S
+(../../lib/detect-object.jar:../../lib/xchart-3.5.2.jar) str
+(' -d bin *.java) p n
+(cp manifest.txt bin) N
+(cd bin) N
+(jar cvfm server.jar manifest.txt *.class) N
+(cd ../) S
+(build.sh) (Page 1/1) (Dec 05, 18 18:21) title
+border
+grestore
+(Printed by ) rhead
+(src/server/build.sh) (45/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 46
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(Manifest-Version: 1.0) p n
+(Main-Class: Server) N
+(manifest.txt) (Page 1/1) (Dec 03, 18 18:21) title
+border
+grestore
+(Printed by ) rhead
+(src/server/manifest.txt) (46/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+%%Page: (1) 47
+%%BeginPageSetup
+/pagesave save def
+sh 0 translate 90 rotate
+%%EndPageSetup
+iso1dict begin
+gsave
+llx lly 12 add translate
+/v 0 store
+/x0 x v get 3.362408 add sx cw mul add store
+/y0 y v get bfs th add sub store
+x0 y0 moveto
+(Table of Contents) K n
+( 1 ) p
+(build.bat...........) k
+( sheets   1 to   1 \( 1\) pages   1-  1   24 lines) p n
+( 2 ) S
+(build.sh............) k
+( sheets   2 to   2 \( 1\) pages   2-  2   22 lines) p n
+( 3 ) S
+(download_models.ps1.) k
+( sheets   3 to   3 \( 1\) pages   3-  3   19 lines) p n
+( 4 ) S
+(download_models.sh..) k
+( sheets   4 to   4 \( 1\) pages   4-  4   12 lines) p n
+( 5 ) S
+(README.md...........) k
+( sheets   5 to   6 \( 2\) pages   5-  7   95 lines) p n
+( 6 ) S
+(Callback.java.......) k
+( sheets   7 to   7 \( 1\) pages   8-  8   56 lines) p n
+( 7 ) S
+(CallbackServer.java.) k
+( sheets   8 to   8 \( 1\) pages   9-  9   28 lines) p n
+( 8 ) S
+(Client.java.........) k
+( sheets   9 to   9 \( 1\) pages  10- 10   63 lines) p n
+( 9 ) S
+(ClientJobVideoAnalytics.java) k
+( sheets  10 to  10 \( 1\) pages  11- 12  107 lines) p n
+(10 ) S
+(ICallback.java......) k
+( sheets  11 to  11 \( 1\) pages  13- 13    8 lines) p n
+(11 ) S
+(IServiceInterface.java) k
+( sheets  12 to  12 \( 1\) pages  14- 14    9 lines) p n
+(12 ) S
+(IServiceNode.java...) k
+( sheets  13 to  13 \( 1\) pages  15- 15   10 lines) p n
+(13 ) S
+(ServiceNode.java....) k
+( sheets  14 to  14 \( 1\) pages  16- 16   25 lines) p n
+(14 ) S
+(TrackerHandler.java.) k
+( sheets  15 to  15 \( 1\) pages  17- 17   59 lines) p n
+(15 ) S
+(TrackerInterface.java) k
+( sheets  16 to  16 \( 1\) pages  18- 18   13 lines) p n
+(16 ) S
+(bin.................) k
+( sheets  16 to  16 \( 1\) pages  18- 18    1 lines) p n
+(17 ) S
+(build.bat...........) k
+( sheets  17 to  17 \( 1\) pages  19- 19    8 lines) p n
+(18 ) S
+(build.sh............) k
+( sheets  18 to  18 \( 1\) pages  20- 20    7 lines) p n
+(19 ) S
+(manifest.txt........) k
+( sheets  19 to  19 \( 1\) pages  21- 21    3 lines) p n
+(20 ) S
+(IServiceNode.java...) k
+( sheets  20 to  20 \( 1\) pages  22- 22   10 lines) p n
+(21 ) S
+(ServiceNode.java....) k
+( sheets  21 to  21 \( 1\) pages  23- 23   25 lines) p n
+(22 ) S
+(Tracker.java........) k
+( sheets  22 to  22 \( 1\) pages  24- 24   49 lines) p n
+(23 ) S
+(TrackerImpl.java....) k
+( sheets  23 to  23 \( 1\) pages  25- 26   99 lines) p n
+(24 ) S
+(TrackerInterface.java) k
+( sheets  24 to  24 \( 1\) pages  27- 27   13 lines) p n
+(25 ) S
+(TrackerServer.java..) k
+( sheets  25 to  25 \( 1\) pages  28- 28   23 lines) p n
+(26 ) S
+(bin.................) k
+( sheets  25 to  25 \( 1\) pages  28- 28    1 lines) p n
+(27 ) S
+(build.bat...........) k
+( sheets  26 to  26 \( 1\) pages  29- 29    8 lines) p n
+(28 ) S
+(build.sh............) k
+( sheets  27 to  27 \( 1\) pages  30- 30    7 lines) p n
+(29 ) S
+(manifest.txt........) k
+( sheets  28 to  28 \( 1\) pages  31- 31    3 lines) p n
+(30 ) S
+(CallBackHandler.java) k
+( sheets  29 to  29 \( 1\) pages  32- 32   36 lines) p n
+(31 ) S
+(ICallback.java......) k
+( sheets  30 to  30 \( 1\) pages  33- 33    8 lines) p n
+(32 ) S
+(IService.java.......) k
+( sheets  31 to  31 \( 1\) pages  34- 34    5 lines) p n
+(33 ) S
+(IServiceInterface.java) k
+( sheets  32 to  32 \( 1\) pages  35- 35    9 lines) p n
+(34 ) S
+(IServiceNode.java...) k
+( sheets  33 to  33 \( 1\) pages  36- 36   10 lines) p n
+(35 ) S
+(Server.java.........) k
+( sheets  34 to  34 \( 1\) pages  37- 37   61 lines) p n
+(36 ) S
+(ServerService.java..) k
+( sheets  35 to  35 \( 1\) pages  38- 38   53 lines) p n
+(37 ) S
+(ServiceImageAnalytics.java) k
+( sheets  36 to  36 \( 1\) pages  39- 40   86 lines) p n
+(38 ) S
+(ServiceImageAnalyticsGraph.java) k
+( sheets  37 to  37 \( 1\) pages  41- 41   39 lin) p n
+(es) N
+(39 ) S
+(ServiceImpl.java....) k
+( sheets  38 to  38 \( 1\) pages  42- 43  107 lines) p n
+(40 ) S
+(ServiceNode.java....) k
+( sheets  39 to  39 \( 1\) pages  44- 44   25 lines) p n
+(41 ) S
+(ServiceVideoAnalytics.java) k
+( sheets  40 to  41 \( 2\) pages  45- 47  163 lines) p n
+(42 ) S
+(ServiceVideoSplit.java) k
+( sheets  42 to  42 \( 1\) pages  48- 49   66 lines) p n
+(43 ) S
+(TrackerInterface.java) k
+( sheets  43 to  43 \( 1\) pages  50- 50   13 lines) p n
+(44 ) S
+(bin.................) k
+( sheets  43 to  43 \( 1\) pages  50- 50    1 lines) p n
+(45 ) S
+(build.bat...........) k
+( sheets  44 to  44 \( 1\) pages  51- 51    8 lines) p n
+(46 ) S
+(build.sh............) k
+( sheets  45 to  45 \( 1\) pages  52- 52    7 lines) p n
+(47 ) S
+(manifest.txt........) k
+( sheets  46 to  46 \( 1\) pages  53- 53    3 lines) p n
+(Table of Content) (Page 1/1) (Dec 05, 18 19:29) title
+border
+grestore
+(Printed by ) rhead
+(Table of Content) (47/47) (Wednesday December 05, 2018) footer
+end % of iso1dict
+pagesave restore
+showpage
+
+%%Trailer
+end
+%%EOF

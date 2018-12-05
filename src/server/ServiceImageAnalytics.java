@@ -9,17 +9,22 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class ServiceImageAnalytics implements IService {
-  public String[] run(String[] data) {
-    return null;
+  public String[] run(String[] data) throws Exception {
+    throw new Exception("This is not implemented. Please use byte[][] variant.");
   }
-  public byte[][] run(byte[][] data, String[] data2) {
+  // data[0] Array of bytes
+  // data[0][0] bytes of Images
+  // data2 not used
+  public byte[][] run(byte[][] data, String[] data2) throws Exception {
+    // If Simulate is on, use hard coded value
     if(Server.p.getProperty("image_analytics_simulate").equals("0")){
       return ExecuteImageAnalytics(data);
     }
     return ExecuteImageAnalyticsSimulate();
   }
-  private byte[][] ExecuteImageAnalytics(byte[][] data){
-    // Generate Files
+  // Execute tensor flow detect object
+  private byte[][] ExecuteImageAnalytics(byte[][] data) throws Exception{
+    // Generate CSV file
     File csvFile = new File("out.csv");
     ArrayList<String> cmdA = new ArrayList<>();
     cmdA.add("java");
@@ -29,6 +34,7 @@ public class ServiceImageAnalytics implements IService {
     cmdA.add(Server.p.getProperty("image_analytics_label"));
     cmdA.add(csvFile.toString());
     try {
+      // Write the image to disk
       File basePath = new File("image_analytics");
       basePath.mkdir();
       File dir = Files.createTempDirectory(basePath.toPath(), "image_analytics").toFile();
@@ -38,19 +44,22 @@ public class ServiceImageAnalytics implements IService {
         try (FileOutputStream fos = new FileOutputStream(f)) {
           fos.write(b);
         }
+      // Add to command
         cmdA.add(f.toString());
       }
     } catch (Exception e) {
       e.printStackTrace();
-      return null;
+      throw e;
     }
     try {
       String[] cmd = new String[cmdA.size()];
       cmdA.toArray(cmd);
       System.out.println(Arrays.toString(cmd));
+      // Call the tensor flow jar file to process images
       ProcessBuilder ps = new ProcessBuilder(cmd);
       ps.redirectErrorStream(true);
       Process pr = ps.start();
+      // Read the output stream
       BufferedReader in = new BufferedReader(new InputStreamReader(pr.getInputStream()));
       String line;
       while ((line = in.readLine()) != null) {
@@ -60,13 +69,14 @@ public class ServiceImageAnalytics implements IService {
       pr.waitFor();
     } catch (Exception e) {
       e.printStackTrace();
-      return null;
+      throw e;
     }
     try {
+      // Read the csv file and return it
       return new byte[][] { Files.readAllBytes(csvFile.toPath()) };
     } catch (Exception e) {
       e.printStackTrace();
-      return null;
+      throw e;
     }
   }
   private byte[][] ExecuteImageAnalyticsSimulate(){

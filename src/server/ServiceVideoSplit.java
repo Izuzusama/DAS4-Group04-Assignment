@@ -7,15 +7,15 @@ import java.nio.file.Files;
 import java.util.Arrays;
 
 class ServiceVideoSplit implements IService {
-  public String[] run(String[] data) {
-    return null;
+  public String[] run(String[] data) throws Exception {
+    throw new Exception("This is not implemented. Please use byte[][] variant.");
   }
 
-  // data = video file
-  // data2 = filename
-  public byte[][] run(byte[][] data, String[] data2) {
-    // Save the file
+  // data[0] = video file
+  // data2[0] = filename
+  public byte[][] run(byte[][] data, String[] data2) throws Exception {
     try {
+      // Save the video file
       new File("temp/").mkdirs();
       new File("temp/" + data2[0] + "out/").mkdirs();
       try (FileOutputStream fos = new FileOutputStream("temp/" + data2[0])) {
@@ -23,27 +23,33 @@ class ServiceVideoSplit implements IService {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      return null;
+      throw e;
     }
     // split file
     try {
-      final String[] cmd = { "ffmpeg", "-i", "temp/" + data2[0], "-vf", "\"scale=720:-1,fps=4\"",
+      // Setup cmd
+      String[] cmd = { Server.p.getProperty("ffmpeg_command"), "-i", "temp/" + data2[0], "-vf", "scale=720:-1,fps=4",
           "temp/" + data2[0] + "out/out%d.png" };
       System.out.println(Arrays.toString(cmd));
       ProcessBuilder ps = new ProcessBuilder(cmd);
       ps.redirectErrorStream(true);
+      // Call ffmpeg to split video 4 frames per seconds
       Process pr = ps.start();
+      // Read the output stream
       BufferedReader in = new BufferedReader(new InputStreamReader(pr.getInputStream()));
       String line;
       while ((line = in.readLine()) != null) {
-          System.out.println(line);
+        System.out.println(line);
       }
       in.close();
       pr.waitFor();
+      if (pr.exitValue() != 0)
+        throw new Exception("ffmpeg return non 0 exit code.");
     } catch (Exception e) {
       e.printStackTrace();
-      return null;
+      throw e;
     }
+    // Read the output image files as byte
     File dir = new File("temp/" + data2[0] + "out/");
     File[] files = dir.listFiles();
     byte[][] bytes = new byte[files.length][];
