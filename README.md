@@ -68,3 +68,24 @@ Go to `bin\tracker` and run `java -jar tracker.jar` in command line / terminal
 Go to `bin\server` and run `java -cp server.jar;xchart-3.5.2.jar Server` for windows in command line. Run `java -cp server.jar:xchart-3.5.2.jar Server` for linux in terminal
 
 Go to `bin\client` and run `java -jar client.jar` in command line / terminal
+
+# Acknowledgements & License
+
+## TensorFlow demo Program
+
+The ImageAnalytics potion of the program uses an external jar application to do the analytics. Mainly the TensorFlow demo program that can be found at <https://github.com/tensorflow/models/tree/master/samples/languages/java/object_detection>
+
+Since the jar demo application does not provide an easy way to extract info out, we modified the code to output a CSV file. It's then package as a standalone JAR file.
+A copy of the license can be found at lib/detect-object-LICENSE
+
+## Xchart
+
+The ImageAnalyticsGraph part of the program uses an external library called xchart <https://knowm.org/open-source/xchart/>. No modification is made on the source. A copy of the license can be found at lib/xchart-LICENSE
+
+## ffmpeg
+
+The VideoSplit part of the program uses an external application called ffmpeg <https://www.ffmpeg.org/> to split videos to multiple images.
+
+## 7za
+
+No part of the application is using 7za.exe but it is used for the `download_models.ps1` script.
