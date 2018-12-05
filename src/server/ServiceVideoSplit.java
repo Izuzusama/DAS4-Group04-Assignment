@@ -7,13 +7,13 @@ import java.nio.file.Files;
 import java.util.Arrays;
 
 class ServiceVideoSplit implements IService {
-  public String[] run(String[] data) {
-    return null;
+  public String[] run(String[] data)throws Exception  {
+    throw new Exception("This is not implemented. Please use byte[][] variant.");
   }
 
   // data = video file
   // data2 = filename
-  public byte[][] run(byte[][] data, String[] data2) {
+  public byte[][] run(byte[][] data, String[] data2)throws Exception  {
     // Save the file
     try {
       new File("temp/").mkdirs();
@@ -23,12 +23,11 @@ class ServiceVideoSplit implements IService {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      return null;
+      throw e;
     }
     // split file
     try {
-      final String[] cmd = { "ffmpeg", "-i", "temp/" + data2[0], "-vf", "\"scale=720:-1,fps=4\"",
-          "temp/" + data2[0] + "out/out%d.png" };
+      final String[] cmd = { Server.p.getProperty("ffmpeg_command"), "-i", "temp/" + data2[0], "-vf", "scale=720:-1,fps=4", "temp/" + data2[0] + "out/out%d.png" };
       System.out.println(Arrays.toString(cmd));
       ProcessBuilder ps = new ProcessBuilder(cmd);
       ps.redirectErrorStream(true);
@@ -40,9 +39,11 @@ class ServiceVideoSplit implements IService {
       }
       in.close();
       pr.waitFor();
+      if(pr.exitValue() != 0)
+        throw new Exception("ffmpeg return non 0 exit code.");
     } catch (Exception e) {
       e.printStackTrace();
-      return null;
+      throw e;
     }
     File dir = new File("temp/" + data2[0] + "out/");
     File[] files = dir.listFiles();

@@ -9,16 +9,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class ServiceImageAnalytics implements IService {
-  public String[] run(String[] data) {
-    return null;
+  public String[] run(String[] data) throws Exception {
+    throw new Exception("This is not implemented. Please use byte[][] variant.");
   }
-  public byte[][] run(byte[][] data, String[] data2) {
+  public byte[][] run(byte[][] data, String[] data2) throws Exception {
     if(Server.p.getProperty("image_analytics_simulate").equals("0")){
       return ExecuteImageAnalytics(data);
     }
     return ExecuteImageAnalyticsSimulate();
   }
-  private byte[][] ExecuteImageAnalytics(byte[][] data){
+  private byte[][] ExecuteImageAnalytics(byte[][] data) throws Exception{
     // Generate Files
     File csvFile = new File("out.csv");
     ArrayList<String> cmdA = new ArrayList<>();
@@ -42,7 +42,7 @@ public class ServiceImageAnalytics implements IService {
       }
     } catch (Exception e) {
       e.printStackTrace();
-      return null;
+      throw e;
     }
     try {
       String[] cmd = new String[cmdA.size()];
@@ -60,13 +60,13 @@ public class ServiceImageAnalytics implements IService {
       pr.waitFor();
     } catch (Exception e) {
       e.printStackTrace();
-      return null;
+      throw e;
     }
     try {
       return new byte[][] { Files.readAllBytes(csvFile.toPath()) };
     } catch (Exception e) {
       e.printStackTrace();
-      return null;
+      throw e;
     }
   }
   private byte[][] ExecuteImageAnalyticsSimulate(){

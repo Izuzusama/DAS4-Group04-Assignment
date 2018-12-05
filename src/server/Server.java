@@ -24,6 +24,7 @@ public class Server {
        p.put("image_analytics_model_dir", "models/ssd_inception_v2_coco_2017_11_17/saved_model");
        p.put("image_analytics_label", "labels/mscoco_label_map.pbtxt");
        p.put("image_analytics_simulate", "0");
+       p.put("ffmpeg_command", "./ffmpeg");
        p.store(out, null);
      } catch (Exception e) {
        System.err.println("Unable to save file server.config.properties");

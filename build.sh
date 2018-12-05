@@ -17,5 +17,5 @@ cp bin/client.jar ../../bin/client/
 cd ../../
 
 # Copy Lib files
-cp lib/* bin/server/
-cp tools/ffmpeg.exe bin/server/
+cp lib/*.jar bin/server/
+cp tools/ffmpeg bin/server/

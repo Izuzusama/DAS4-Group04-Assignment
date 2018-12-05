@@ -5,51 +5,39 @@ import java.util.HashMap;
 import java.util.Map;
 
 class ServiceVideoAnalytics implements IService {
-  public String[] run(String[] data) {
-    return null;
+  public String[] run(String[] data) throws Exception {
+    throw new Exception("This is not implemented. Please use byte[][] variant.");
   }
 
   // data = video file
   // data2 = filename
-  public byte[][] run(byte[][] data, String[] data2) {
+  public byte[][] run(byte[][] data, String[] data2) throws Exception {
     // Setup all service nodes first before executing
     ArrayList<IServiceInterface> videoSplitNode = GetServices("VideoSplit", 1);
     ArrayList<IServiceInterface> imageAnalyticsNode = GetServices("ImageAnalytics", 4);
     ArrayList<IServiceInterface> imageAnalyticsGraphNode = GetServices("ImageAnalyticsGraph", 1);
     if (videoSplitNode == null || imageAnalyticsNode == null || imageAnalyticsGraphNode == null) {
       System.err.println("Unable to find one of the node.");
-      return null;
+      throw new Exception("Unable to find one of the node.");
     }
     byte[][] fileBytes = GenerateVideoThumb(data[0], data2[0], videoSplitNode.get(0));
-    if (fileBytes == null) {
-      return null;
-    }
     byte[] nameToOccurance = ImageAnalytics(fileBytes, imageAnalyticsNode);
-    if(nameToOccurance == null){
-      return null;
-    }
     byte[] graphImg = GraphIt(nameToOccurance, imageAnalyticsGraphNode.get(0));
-    if(graphImg == null){
-      return null;
-    }
     return new byte[][]{graphImg};
   }
 
-  private byte[][] GenerateVideoThumb(byte[] data, String filename, IServiceInterface service) {
+  private byte[][] GenerateVideoThumb(byte[] data, String filename, IServiceInterface service) throws Exception {
     byte[][] fileBytes;
     try {
       fileBytes = service.RunService("VideoSplit", new byte[][] { data }, new String[] { filename });
     } catch (Exception e) {
       e.printStackTrace();
-      return null;
-    }
-    if (fileBytes == null) {
-      return null;
+      throw e;
     }
     return fileBytes;
   }
 
-  private byte[] ImageAnalytics(byte[][] files, ArrayList<IServiceInterface> services) {
+  private byte[] ImageAnalytics(byte[][] files, ArrayList<IServiceInterface> services) throws Exception {
     ArrayList<byte[]>[] splitedFiles = SplitFiles(files, services.size());
     Thread[] threads = new Thread[services.size()];
     byte[][] result = new byte[services.size()][];
@@ -82,6 +70,7 @@ class ServiceVideoAnalytics implements IService {
         threads[i].join();
       } catch (Exception e) {
         e.printStackTrace();
+        throw e;
       }
     }
     StringBuilder sb = new StringBuilder();
@@ -105,7 +94,7 @@ class ServiceVideoAnalytics implements IService {
       }
     }
     if(nameToOccurance.keySet().size() == 0){
-      return null;
+      throw new Exception("No result from Image Analytics.");
     }
     for (String key : nameToOccurance.keySet()) {
       sb.append(key).append(",").append(nameToOccurance.get(key)).append("\n");
@@ -114,16 +103,13 @@ class ServiceVideoAnalytics implements IService {
     return sb.toString().getBytes();
   }
 
-  private byte[] GraphIt(byte[] nameToOccuranceCsv, IServiceInterface service){
+  private byte[] GraphIt(byte[] nameToOccuranceCsv, IServiceInterface service) throws Exception{
     byte[][] fileBytes;
     try {
       fileBytes = service.RunService("ImageAnalyticsGraph", new byte[][] { nameToOccuranceCsv }, null);
     } catch (Exception e) {
       e.printStackTrace();
-      return null;
-    }
-    if (fileBytes == null) {
-      return null;
+      throw e;
     }
     return fileBytes[0];
   }
