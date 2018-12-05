@@ -1,0 +1,53 @@
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.util.Properties;
+
+public class Server {
+  static Registry r;
+  static Properties p;
+  public static void main(String[] args) {
+   Properties p = new Properties();
+   Server.p = p;
+   File file = new File("server.config.properties");
+   if (!file.exists()) {
+     try {
+       System.out.println("Cant find properties file. Writing default.");
+       FileOutputStream out = new FileOutputStream("server.config.properties");
+       p.put("tracker", "localhost:1099");
+       p.put("services", "VideoAnalytics,VideoSplit,ImageAnalytics,ImageAnalyticsGraph");
+       p.put("rmi_registry_host", "localhost");
+       p.put("rmi_registry_port", "1000");
+       p.put("image_analytics_model_dir", "models/ssd_inception_v2_coco_2017_11_17/saved_model");
+       p.put("image_analytics_label", "labels/mscoco_label_map.pbtxt");
+       p.put("image_analytics_simulate", "0");
+       p.store(out, null);
+     } catch (Exception e) {
+       System.err.println("Unable to save file server.config.properties");
+       e.printStackTrace();
+       return;
+     }
+   } else {
+     try {
+       FileInputStream in = new FileInputStream("server.config.properties");
+       p.load(in);
+     } catch (Exception e) {
+       System.err.println("Unable to open file server.config.properties");
+       e.printStackTrace();
+       return;
+     }
+   }
+   try {
+     System.setProperty("java.rmi.server.hostname",p.getProperty("rmi_registry_host"));
+     int port = Integer.parseInt(p.get("rmi_registry_port").toString());
+     r = LocateRegistry.createRegistry(port);
+   } catch (Exception e) {
+     e.printStackTrace();
+     return;
+   }
+   new ServerService(p).run();
+  }
+}
